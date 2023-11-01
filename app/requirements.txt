@@ -1,2 +1,5 @@
 fastapi
 uvicorn[standard]
+python-decouple
+pymongo
+PyJWT
