@@ -1,5 +1,6 @@
 fastapi
 uvicorn[standard]
-python-decouple
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
 pymongo
-PyJWT

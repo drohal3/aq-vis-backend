@@ -1,0 +1,1 @@
+2023-12-11 intro to FastAPI + authentication https://www.youtube.com/watch?v=5GxQ1rLTwaU
