@@ -8,18 +8,19 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-# from dotenv import dotenv_values
+from utils.config import DotEnvConfig
+
 # from pymongo import MongoClient
 # from fastapi.security import OAuth2PasswordBearer
 # from typing import Annotated
 #
 #
-# config = dotenv_values(".env")
-#
 
-SECRET_KEY = "c97f65c11c8d34f1c7d7b955caceb6b65f4012db66883e0fd845fa7c8def579a"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+config = DotEnvConfig()
+
+SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
+ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
+ACCESS_TOKEN_EXPIRE_MINUTES = config.get_config(DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
 
 db = {
     "dom": {
@@ -100,6 +101,8 @@ async def get_current_active_user(current_user: UserInDB = Depends(get_current_u
 
     return current_user
 
+
+# TODO: use routers instead defining routs directly in main.py
 @app.post("/create_user", response_model=User)
 def create_user(form_data: NewUser):
     password = form_data.password

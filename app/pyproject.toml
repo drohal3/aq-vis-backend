@@ -1,0 +1,13 @@
+[project]
+name = "cpc_rpi_drohal3"
+version = "0.0.1"
+authors = [
+  { name="Dominik Rohal", email="rohal.dominik.123@gmail.com" },
+]
+description = "Backend for data visualisation app."
+readme = "README.md"
+requires-python = "3.9.2"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
