@@ -2,18 +2,20 @@
 
 from fastapi import Depends, FastAPI,HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from models.user import User, NewUser
-from models.auth import Token
+from src.models.user import User, NewUser
+from src.models.auth import Token
 from datetime import timedelta
 
-from utils.config import DotEnvConfig
-from dependencies.authentication import (
+from src.utils.config import DotEnvConfig
+from src.dependencies.authentication import (
     get_password_hash,
     create_access_token,
     db,
     authenticate_user,
     get_current_active_user
 )
+
+from fastapi.middleware.cors import CORSMiddleware
 
 # from pymongo import MongoClient
 # from fastapi.security import OAuth2PasswordBearer
@@ -25,10 +27,18 @@ config = DotEnvConfig()
 
 SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
 ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
-ACCESS_TOKEN_EXPIRE_MINUTES = config.get_config(DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+ACCESS_TOKEN_EXPIRE_MINUTES = int(config.get_config(DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES))
 
 app = FastAPI()
 
+# Allow all origins in development, TODO: adjust accordingly for production
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 

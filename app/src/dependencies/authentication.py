@@ -4,9 +4,9 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from utils.config import DotEnvConfig
-from models.auth import Token, TokenData
-from models.user import (User, UserInDB, NewUser)
+from src.utils.config import DotEnvConfig
+from src.models.auth import Token, TokenData
+from src.models.user import (User, UserInDB, NewUser)
 
 
 
