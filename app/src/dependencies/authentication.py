@@ -63,8 +63,10 @@ def get_user(db, username: str):
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username)
     if not user:
+        print(f"username {username} not found")
         return False
     if not verify_password(password, user.hashed_password):
+        print("password incorrect")
         return False
 
     return user

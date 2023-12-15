@@ -58,7 +58,9 @@ def create_user(form_data: NewUser):
 
 @app.post("/token", response_model=Token)
 async def login_for_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    print("-----> Login for token")
     user = authenticate_user(db, form_data.username, form_data.password)
+    print(user)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Incorrect username or password",
