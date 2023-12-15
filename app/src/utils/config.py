@@ -1,3 +1,5 @@
+import os
+
 from dotenv import dotenv_values
 
 class DotEnvConfig:
@@ -13,5 +15,5 @@ class DotEnvConfig:
         print(f"dotenv: {self.config}")
 
     def get_config(self, key):
-        pass
+        return self.config[key]
 

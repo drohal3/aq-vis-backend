@@ -1,13 +1,16 @@
 [project]
-name = "cpc_rpi_drohal3"
+name = "cpc_vis_ideal_aq"
 version = "0.0.1"
 authors = [
   { name="Dominik Rohal", email="rohal.dominik.123@gmail.com" },
 ]
 description = "Backend for data visualisation app."
 readme = "README.md"
-requires-python = "3.9.2"
+requires-python = "3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+
+[tool.setuptools]
+py-modules = ["src"]
