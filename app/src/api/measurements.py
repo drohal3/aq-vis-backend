@@ -11,7 +11,7 @@ TABLE = "cpc_measurements_test"
 
 router = APIRouter()
 config = DotEnvConfig()
-@router.get("/")
+@router.get("")
 def read_items(date_time_from, date_time_to, current_user: User = Depends(get_current_active_user)):
     dynamodb = boto3.resource('dynamodb',
                               aws_access_key_id=config.get_config(config.ENV_AWS_ACCESS_KEY_ID),
