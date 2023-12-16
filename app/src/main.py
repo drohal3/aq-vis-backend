@@ -15,6 +15,8 @@ from src.dependencies.authentication import (
     get_current_active_user
 )
 
+from src.api.measurements import router as measurements_router
+
 from fastapi.middleware.cors import CORSMiddleware
 
 # from pymongo import MongoClient
@@ -30,6 +32,7 @@ ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
 ACCESS_TOKEN_EXPIRE_MINUTES = int(config.get_config(DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES))
 
 app = FastAPI()
+app.include_router(measurements_router, prefix="/measurements", tags=["measurements"])
 
 # Allow all origins in development, TODO: adjust accordingly for production
 app.add_middleware(

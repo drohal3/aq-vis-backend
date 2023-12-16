@@ -4,3 +4,4 @@ python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
 pymongo
+boto3
