@@ -12,7 +12,7 @@ TABLE = "cpc_measurements_test"
 router = APIRouter()
 config = DotEnvConfig()
 @router.get("")
-def read_items(date_time_from, date_time_to, current_user: User = Depends(get_current_active_user)):
+def read_items(date_time_from, date_time_to, device_id, current_user: User = Depends(get_current_active_user)):
     dynamodb = boto3.resource('dynamodb',
                               aws_access_key_id=config.get_config(config.ENV_AWS_ACCESS_KEY_ID),
                               aws_secret_access_key=config.get_config(config.ENV_AWS_SECRET_ACCESS_KEY),
@@ -23,8 +23,15 @@ def read_items(date_time_from, date_time_to, current_user: User = Depends(get_cu
     # DATE_FROM = '2023-11-23 12:30:00'
     # DATE_TO = '2023-11-23 13:30:00'
     response = table.query(
-        KeyConditionExpression=Key('device_id').eq(0) & Key('sample_date_time')
+        KeyConditionExpression=Key('device_id').eq(device_id) & Key('sample_date_time')
         .between(date_time_from, date_time_to)
     )
     print(response)
     return response["Items"]
+
+@router.get("/devices")
+def get_devices(current_user: User = Depends(get_current_active_user)):
+    return [{
+        "name": "cpc1",
+        "id": 0
+    }]
