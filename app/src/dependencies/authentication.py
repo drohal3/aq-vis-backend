@@ -9,7 +9,6 @@ from src.models.auth import Token, TokenData
 from src.models.user import (User, UserInDB, NewUser)
 
 
-
 config = DotEnvConfig()
 
 SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
@@ -39,6 +38,9 @@ def create_access_token(data: dict, expires_delta: timedelta or None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
+
+def create_refresh_token():
+    pass
 
 db = {
     "dom": {
@@ -76,8 +78,11 @@ def authenticate_user(db, username: str, password: str):
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     try:
+        print(f"token: {token}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
+        print(payload)
+        print(f"username: {username}")
         if username is None:
             print("No username")
             raise credentials_exception

@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.models.auth import Token
 from fastapi.security import OAuth2PasswordRequestForm
+
 from src.dependencies.authentication import (
-    get_password_hash,
     create_access_token,
     db,
     authenticate_user,
-    get_current_active_user
 )
 from datetime import timedelta
 from src.utils.config import DotEnvConfig

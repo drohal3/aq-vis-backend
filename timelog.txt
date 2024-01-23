@@ -1,1 +1,3 @@
 2023-12-11 intro to FastAPI + authentication https://www.youtube.com/watch?v=5GxQ1rLTwaU
+2024-01-22 solving issues with user/me endpoint (400 and 401 error when logged in from frontend after refactoring)
+           figuring out how to work with pymongo in multiple routers
