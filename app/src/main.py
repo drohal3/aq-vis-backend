@@ -1,4 +1,5 @@
 # Authentication tutorial: https://github.com/techwithtim/Fast-API-Tutorial/blob/main/main.py
+# FastAPI tutorial: https://www.youtube.com/watch?v=XnYYwcOfcn8&list=PLqAmigZvYxIL9dnYeZEhMoHcoP4zop8-p
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,10 +11,25 @@ from src.api.auth import router as auth_router
 
 from pymongo import MongoClient
 
+import logging
+
 # from fastapi.security import OAuth2PasswordBearer
 # from typing import Annotated
 #
 #
+
+logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s %(levelname)s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        # filename="basic.log",
+    )
+
+logging.debug("This is a debug message.")
+logging.info("This is an info message.")
+logging.warning("This is a warning message.")
+logging.error("This is an error message.")
+logging.critical("This is a critical message.")
 
 config = DotEnvConfig()
 
@@ -62,10 +78,11 @@ async def startup_db_client():
         if not r:
             continue
         r.database = app.database
-    print("Connected to the MongoDB database!")
+    logging.info("Connected to the MongoDB database!")
 
 @app.on_event("shutdown")
 def shutdown_db_client():
     app.mongodb_client.close()
+    logging.info("Connected to the MongoDB database closed!")
 
 

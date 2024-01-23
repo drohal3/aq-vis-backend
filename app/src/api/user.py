@@ -10,7 +10,6 @@ router = APIRouter()
 
 @router.post("/create", response_model=User)
 def create_user(form_data: NewUser):
-    print(router.database)
     password = form_data.password
     hashed_password = get_password_hash(password)
 

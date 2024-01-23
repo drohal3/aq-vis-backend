@@ -8,6 +8,7 @@ from src.utils.config import DotEnvConfig
 from src.models.auth import Token, TokenData
 from src.models.user import (User, UserInDB, NewUser)
 
+import logging
 
 config = DotEnvConfig()
 
@@ -53,22 +54,22 @@ db = {
 }
 
 def get_user(db, username: str):
-    print(f"username: {username}")
+    logging.debug(f"get_user() - username: {username}")
     print(db)
     if username in db.keys():
-        print("username found in db")
+        logging.debug("get_user() - username found in db")
         user_data = db[username]
-        print(f"user found {user_data}")
+        logging.debug(f"get_user() - user found {user_data}")
 
         return UserInDB(**user_data)
 
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username)
     if not user:
-        print(f"username {username} not found")
+        logging.debug(f"authenticate_user() - username {username} not found")
         return False
     if not verify_password(password, user.hashed_password):
-        print("password incorrect")
+        print("authenticate_user() - password incorrect")
         return False
 
     return user
@@ -78,13 +79,13 @@ def authenticate_user(db, username: str, password: str):
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     try:
-        print(f"token: {token}")
+        # print(f"token: {token}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        print(payload)
-        print(f"username: {username}")
+        # print(payload)
+        # print(f"username: {username}")
         if username is None:
-            print("No username")
+            # print("No username")
             raise credentials_exception
 
         token_data = TokenData(username=username)
@@ -93,7 +94,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
     user = get_user(db, username=token_data.username)
     if user is None:
-        print("no user")
+        # print("no user")
         raise credentials_exception
 
     return user
