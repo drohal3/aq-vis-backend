@@ -4,13 +4,12 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from src.utils.config import DotEnvConfig
+from src.utils import config, DotEnvConfig, database
 from src.models.auth import Token, TokenData
 from src.models.user import (User, UserInDB, NewUser)
 
 import logging
 
-config = DotEnvConfig()
 
 SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
 ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
@@ -43,25 +42,14 @@ def create_access_token(data: dict, expires_delta: timedelta or None = None):
 def create_refresh_token():
     pass
 
-db = {
-    "dom": {
-        "username": "test",
-        "full_name": "test test",
-        "email": "email@test.com",
-        "hashed_password": "",
-        "disabled": False
-    }
-}
-
-def get_user(db, username: str):
+def get_user(db, username: str) -> UserInDB or None:
     logging.debug(f"get_user() - username: {username}")
-    print(db)
-    if username in db.keys():
-        logging.debug("get_user() - username found in db")
-        user_data = db[username]
-        logging.debug(f"get_user() - user found {user_data}")
+    user = db.users.find_one({"username": username})
+    if user is None:
+        return None
+    logging.debug(f"get_user() - user: {user}")
 
-        return UserInDB(**user_data)
+    return UserInDB(**user)
 
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username)
@@ -92,7 +80,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    user = get_user(db, username=token_data.username)
+    user = get_user(database, username=token_data.username)
+    # TODO: for database, dependency injection as in cases above or not?
     if user is None:
         # print("no user")
         raise credentials_exception

@@ -9,8 +9,6 @@ from src.api.measurements import router as measurements_router
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
 
-from pymongo import MongoClient
-
 import logging
 
 # from fastapi.security import OAuth2PasswordBearer
@@ -48,7 +46,7 @@ routers = {
     },
     "auth": {
         "router": auth_router,
-        "prefix": "/auth",
+        "prefix": "",
         "tags": ["authentication"]
     }
 }
@@ -69,7 +67,6 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_db_client():
-
     app.mongodb_client = database_client
     app.database = database
     for rout in routers.values():

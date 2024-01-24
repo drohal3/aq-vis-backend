@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from src.dependencies.authentication import (
     get_password_hash,
     get_current_active_user,
-    db,
 )
 from src.models.user import User, NewUser
 
@@ -20,12 +19,12 @@ async def create_user(form_data: NewUser):
     new_user_data.pop("password")
     new_user_data["hashed_password"] = hashed_password
     user_id = database.users.insert_one(new_user_data).inserted_id
-
     logging.debug(f"create_user() - user_id: {user_id}")
+    user = database.users.find_one({"_id": user_id})
 
-    db[form_data.username] = new_user_data  # TODO: save in DB
+    logging.info(f"create_user() - created user: {user}")
 
-    return new_user_data
+    return user
 
 @router.get("/me", response_model=User)
 async def read_user_me(current_user: User = Depends(get_current_active_user)):
