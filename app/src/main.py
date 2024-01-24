@@ -4,7 +4,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.utils.config import DotEnvConfig
+from src.utils import config, DotEnvConfig, database_client, database
 from src.api.measurements import router as measurements_router
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
@@ -30,8 +30,6 @@ logging.info("This is an info message.")
 logging.warning("This is a warning message.")
 logging.error("This is an error message.")
 logging.critical("This is a critical message.")
-
-config = DotEnvConfig()
 
 SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
 ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
@@ -71,14 +69,15 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_db_client():
-    app.mongodb_client = MongoClient(config.get_config("MONGODB_CONNECTION_URI"))
-    app.database = app.mongodb_client[config.get_config("DB_NAME")]
+
+    app.mongodb_client = database_client
+    app.database = database
     for rout in routers.values():
         r = rout.get("router", False)
         if not r:
             continue
         r.database = app.database
-    logging.info("Connected to the MongoDB database!")
+    logging.info(f"Connected to the MongoDB database {database.name}!")
 
 @app.on_event("shutdown")
 def shutdown_db_client():
