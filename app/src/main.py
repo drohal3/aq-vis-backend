@@ -8,6 +8,7 @@ from src.utils import config, DotEnvConfig, database_client, database
 from src.api.measurements import router as measurements_router
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
+from src.api.organisations import router as organisations_router
 
 import logging
 
@@ -18,7 +19,7 @@ import logging
 
 logging.basicConfig(
         level=logging.DEBUG,
-        format="%(asctime)s %(levelname)s %(message)s",
+        format="%(asctime)s %(levelname)-8s %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         # filename="basic.log",
     )
@@ -48,6 +49,11 @@ routers = {
         "router": auth_router,
         "prefix": "",
         "tags": ["authentication"]
+    },
+    "organisations": {
+        "router": organisations_router,
+        "prefix": "/organisations",
+        "tags": ["organisations"]
     }
 }
 
