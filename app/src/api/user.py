@@ -9,7 +9,7 @@ import logging
 
 router = APIRouter()
 
-@router.post("/create", response_model=User)
+@router.post("/", response_model=User)
 async def create_user(form_data: NewUser):
     database = router.database
     password = form_data.password

@@ -2,6 +2,6 @@
 2024-01-22 solving issues with user/me endpoint (400 and 401 error when logged in from frontend after refactoring)
            figuring out how to work with pymongo in multiple routers
 2024-02-17 4h - organisation API, models, referencing
-            Problem: mongoDB generated _id can't be a variable of class in Python - got me stuck until figured out
-2024-02-19    - finalized first version of organisation API
+      Problem:  mongoDB generated _id can't be a variable of class in Python - got me stuck until figured out
+2024-02-19 6h - finalized first version of organisation API
               - example request data for new user
