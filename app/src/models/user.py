@@ -5,7 +5,10 @@ class User(BaseModel):
     username: str
     email: str or None = None
     full_name: str or None = None
-    disabled: bool or None = None
+    disabled: bool = Field(default=True, description="Disabled user")
+    organisation: str or None = Field(
+        default=None, description="Organisation the user belongs to"
+    )
 
 class UserInDB(User):
     hashed_password: str
