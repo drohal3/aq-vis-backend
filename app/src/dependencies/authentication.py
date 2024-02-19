@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from src.utils import config, DotEnvConfig, database
 from src.models.auth import Token, TokenData
-from src.models.user import (User, UserInDB, NewUser)
+from src.models.user import (User, UnsecureUser, NewUser)
 
 import logging
 
@@ -42,14 +42,15 @@ def create_access_token(data: dict, expires_delta: timedelta or None = None):
 def create_refresh_token():
     pass
 
-def get_user(db, username: str) -> UserInDB or None:
+def get_user(db, username: str) -> UnsecureUser or None:
     logging.debug(f"get_user() - username: {username}")
     user = db.users.find_one({"username": username})
     if user is None:
         return None
     logging.debug(f"get_user() - user: {user}")
 
-    return UserInDB(**user)
+    user["id"] = str(user["_id"])
+    return UnsecureUser(**user)
 
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username)
@@ -61,8 +62,6 @@ def authenticate_user(db, username: str, password: str):
         return False
 
     return user
-
-
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
@@ -88,7 +87,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
     return user
 
-async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
+async def get_current_active_user(current_user: UnsecureUser = Depends(get_current_user)):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
 

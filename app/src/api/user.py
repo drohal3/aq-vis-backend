@@ -24,6 +24,8 @@ async def create_user(form_data: NewUser):
 
     logging.info(f"create_user() - created user: {user}")
 
+    user["id"] = str(user["_id"])
+
     return user
 
 @router.get("/me", response_model=User)

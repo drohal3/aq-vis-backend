@@ -1,19 +1,21 @@
 from pydantic import BaseModel, Field, EmailStr
 
-
-class User(BaseModel):
+class UserBase(BaseModel):
     username: str
     email: str or None = None
     full_name: str or None = None
     disabled: bool = Field(default=True, description="Disabled user")
-    organisation: str or None = Field(
+    organisation: str | None = Field(
         default=None, description="Organisation the user belongs to"
     )
 
-class UserInDB(User):
+class User(UserBase):
+    id: str
+
+class UnsecureUser(User):
     hashed_password: str
 
-class NewUser(User):
+class NewUser(UserBase):
     password: str
 
     model_config = {
