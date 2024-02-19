@@ -16,6 +16,7 @@ config = DotEnvConfig()
 
 @router.post("/token", response_model=Token)
 async def login_for_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    # TODO: use _id instead of username!
     logging.debug("login_for_token()")
     db = router.database
     user = authenticate_user(db, form_data.username, form_data.password)
