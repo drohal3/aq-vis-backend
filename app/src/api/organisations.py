@@ -39,6 +39,7 @@ async def delete_organisation(id: str):
     database = router.database
     # TODO: authenticate
     database.organisations.delete_one({"_id": ObjectId(id)})
+    # TODO: delete organisation's devices
 
 
 @router.get("/{id}", response_model=OrganisationInDB)
