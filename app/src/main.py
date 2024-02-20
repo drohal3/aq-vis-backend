@@ -8,6 +8,7 @@ from src.utils import config, DotEnvConfig, database_client, database
 from src.api.measurements import router as measurements_router
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
+from src.api.devices import router as devices_router
 from src.api.admin.admin import admin_router
 
 import logging
@@ -49,6 +50,11 @@ routers = {
         "router": auth_router,
         "prefix": "",
         "tags": ["authentication"]
+    },
+    "devices": {
+        "router": devices_router,
+        "prefix": "/devices",
+        "tags": ["devices"]
     },
     "admin": {
         "router": admin_router,
