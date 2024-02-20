@@ -9,6 +9,7 @@ from src.api.measurements import router as measurements_router
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
 from src.api.devices import router as devices_router
+from src.api.organisations import router as organisations_router
 from src.api.admin.admin import admin_router
 
 import logging
@@ -55,6 +56,11 @@ routers = {
         "router": devices_router,
         "prefix": "/devices",
         "tags": ["devices"]
+    },
+    "organisations": {
+        "router": organisations_router,
+        "prefix": "/organisations",
+        "tags": ["organisations"]
     },
     "admin": {
         "router": admin_router,
