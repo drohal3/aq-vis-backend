@@ -6,4 +6,5 @@
 2024-02-19 6h - finalized first version of organisation API
               - example request data for new user
 2026-02-20 8h - admin router
-              -
+              - device API base
+              - intro into API testing
