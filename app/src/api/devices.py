@@ -22,5 +22,16 @@ async def create_device(form_data: NewDevice, current_user: User = Depends(get_c
 
     if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
-    logging.debug(f"Authentication succeed!")
-    # TODO:
+
+    device_id = database.devices.insert_one(form_data.model_dump()).inserted_id
+
+    saved_device = database.devices.find_one({"_id": device_id})
+
+    saved_device["id"] = saved_device["_id"]
+    del saved_device["_id"]
+
+    return saved_device
+
+@router.get("/", response_model=list[Device])
+async def get_devices(organisation: str, current_user: User = Depends(get_current_active_user)):
+    pass

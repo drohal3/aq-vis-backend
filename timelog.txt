@@ -11,4 +11,6 @@
       Problem: database for testing
       Solution?: multi-stage dockerfile, docker build to run tests
       Problem: env variables, secrets
-              -
+      Idea: GraphQl with strawberry: https://strawberry.rocks/docs/integrations/fastapi
+                                     https://fastapi.tiangolo.com/how-to/graphql/
+              - testing with Frontend + frontend adjustments
