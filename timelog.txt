@@ -8,3 +8,7 @@
 2026-02-20 8h - admin router
               - device API base
               - intro into API testing
+      Problem: database for testing
+      Solution?: multi-stage dockerfile, docker build to run tests
+      Problem: env variables, secrets
+              -

@@ -5,4 +5,3 @@ python-jose[cryptography]
 passlib[bcrypt]
 pymongo
 boto3
-pytest
