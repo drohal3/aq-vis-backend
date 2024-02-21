@@ -37,7 +37,19 @@ async def create_device(form_data: NewDevice, current_user: User = Depends(get_c
 @router.get("", response_model=list[Device])
 async def get_devices(organisation: str, current_user: User = Depends(get_current_active_user)):
     organisation = database.organisations.find_one({"_id": ObjectId(organisation)})
-
-    if not current_user.organisation == organisation["_id"]:
+    if not organisation:
+        raise HTTPException(status_code=404, detail="Organisation not found!")
+    if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
+    devices = database.devices.find({"_id": {"$in": organisation["devices"]}})
+
+    ret = []
+
+    for device in devices:
+        device["id"] = str(device["_id"])
+        del device["_id"]
+        ret.append(device)
+        logging.debug(device)
+
+    return ret
