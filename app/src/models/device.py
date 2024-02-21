@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
 class NewDevice(BaseModel):
-    deviceName: str
-    deviceCode: str
+    name: str
+    code: str
     organisation: str
 
 class Device(NewDevice):
