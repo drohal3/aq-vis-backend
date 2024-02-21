@@ -18,8 +18,14 @@ async def get_organisation(organisation_id: str, current_user: User = Depends(ge
     if not current_user.organisation == str(organisation_id):
         raise HTTPException(401, detail="Unauthorized!")
 
-    organisation = database.organisations.find_one({"_id": ObjectId(ObjectId(organisation_id))})
+    organisation = database.organisations.find_one({"_id": ObjectId(organisation_id)})
     organisation["id"] = str(organisation["_id"])
     del organisation["_id"]
+
+    devices = []
+
+    for device in organisation["devices"]:
+        devices.append(str(device))
+    organisation["devices"] = devices
 
     return organisation
