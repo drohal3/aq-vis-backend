@@ -8,6 +8,18 @@ class UserBase(BaseModel):
     organisation: str | None = Field(
         default=None, description="Organisation the user belongs to"
     )
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "username": "string",
+                    "email": "example@test.com",
+                    "full_name": "Example User",
+                    "disabled": False,
+                }
+            ]
+        }
+    }
 
 class User(UserBase):
     id: str
@@ -17,7 +29,6 @@ class UnsecureUser(User):
 
 class NewUser(UserBase):
     password: str
-
     model_config = {
         "json_schema_extra": {
             "examples": [
@@ -26,7 +37,7 @@ class NewUser(UserBase):
                     "email": "example@test.com",
                     "full_name": "Example User",
                     "disabled": False,
-                    "password": "string"
+                    "password": "string",
                 }
             ]
         }
