@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+# TODO: validation
 class Parameter(BaseModel):
     name: str
     unit: str  # unit_id

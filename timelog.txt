@@ -16,3 +16,4 @@
               - testing with Frontend + frontend adjustments
 2024-02-21 3h - API errors (frontend and value type causes of the issues)
               - device API - creating device, saving device IDs in organisation, listing devices by organisation
+2024-02-22 xh - device and unit API
