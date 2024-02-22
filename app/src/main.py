@@ -5,11 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.utils import config, DotEnvConfig, database_client, database
-from src.api.measurements import router as measurements_router
-from src.api.user import router as user_router
-from src.api.auth import router as auth_router
-from src.api.devices import router as devices_router
-from src.api.organisations import router as organisations_router
+from src.api import measurements_router, user_router, auth_router, devices_router, organisations_router
 from src.api.admin.admin import admin_router
 
 import logging
