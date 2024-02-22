@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.utils import config, DotEnvConfig, database_client, database
-from src.api import measurements_router, user_router, auth_router, devices_router, organisations_router
+from src.api import measurements_router, user_router, auth_router, devices_router, organisations_router, units_router
 from src.api.admin.admin import admin_router
 
 import logging
@@ -57,6 +57,11 @@ routers = {
         "router": organisations_router,
         "prefix": "/organisations",
         "tags": ["organisations"]
+    },
+    "units": {
+        "router": units_router,
+        "prefix": "/units",
+        "tags": ["units"]
     },
     "admin": {
         "router": admin_router,
