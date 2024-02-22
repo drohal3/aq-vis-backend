@@ -14,5 +14,5 @@
       Idea: GraphQl with strawberry: https://strawberry.rocks/docs/integrations/fastapi
                                      https://fastapi.tiangolo.com/how-to/graphql/
               - testing with Frontend + frontend adjustments
-2024-02-21 4h - API errors (frontend and value type causes of the issues)
+2024-02-21 3h - API errors (frontend and value type causes of the issues)
               - device API - creating device, saving device IDs in organisation, listing devices by organisation
