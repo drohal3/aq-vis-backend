@@ -3,6 +3,7 @@ from pydantic import BaseModel
 # TODO: validation
 class Parameter(BaseModel):
     name: str
+    code: str
     unit: str  # unit_id
     description: str | None = None
 
