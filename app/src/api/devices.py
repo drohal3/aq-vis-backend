@@ -54,12 +54,13 @@ async def get_devices(organisation: str, current_user: User = Depends(get_curren
 
     return ret
 
-@router.delete("")
-async def delete_device(device_id: str, current_user: User = Depends()):
-    device = database.devices.find_one({"_id": ObjectId(device_id)})
+@router.delete("/{id}")
+async def delete_device(id: str, current_user: User = Depends(get_current_active_user)):
+    logging.debug(f"Deleting device {id}")
+    device = database.devices.find_one({"_id": ObjectId(id)})
     if not device:
         raise HTTPException(status_code=404, detail="Device not found!")
     if not current_user.organisation == str(device["organisation"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
-    database.devices.delete_one({"_id": ObjectId(device_id)})
+    database.devices.delete_one({"_id": ObjectId(id)})
