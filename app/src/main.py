@@ -92,6 +92,9 @@ async def startup_db_client():
     database_name = config.get_database_name()
     database_url = config.get_config("MONGODB_CONNECTION_URI")
 
+    logging.debug(f"Database URL: {database_url}")
+    logging.debug(f"Database Name: {database_name}")
+
     mongo_db.create_database(database_name, database_url)
 
     database = mongo_db.get_database()

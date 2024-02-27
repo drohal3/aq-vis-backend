@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.dependencies.authentication import get_password_hash, get_current_active_user
 from src.models.user import User, NewUser
-from src.utils import database
+from src.utils import mongo_db
 
 import logging
 
@@ -11,6 +11,7 @@ router = APIRouter()
 
 @router.post("/", response_model=User)
 async def create_user(form_data: NewUser):
+    database = mongo_db.get_database()
     password = form_data.password
     hashed_password = get_password_hash(password)
 
