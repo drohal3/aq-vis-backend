@@ -13,5 +13,8 @@ To run tests, run while running backend in container:
 docker exec -it app-backend /bin/bash pytest
 ```
 
-## Environment
+## Environment Variables
+- `MONGODB_CONNECTION_URI`: Connection URL for mongo db
+- `DB_NAME`: Name of database
+- `DB_NAME_TEST`: Name of database used to run tests
 
