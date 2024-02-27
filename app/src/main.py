@@ -4,7 +4,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.utils import config, DotEnvConfig, database_client, database
+from src.utils import config, DotEnvConfig, mongo_db
 from src.api import measurements_router, user_router, auth_router, devices_router, organisations_router, units_router
 from src.api.admin.admin import admin_router
 
@@ -89,6 +89,17 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_db_client():
+    database_name = config.get_database_name()
+    database_url = config.get_config("MONGODB_CONNECTION_URI")
+
+    logging.debug(f"Database URL: {database_url}")
+    logging.debug(f"Database Name: {database_name}")
+
+    mongo_db.create_database(database_name, database_url)
+
+    database = mongo_db.get_database()
+    database_client = mongo_db.get_client()
+
     app.mongodb_client = database_client
     app.database = database
     for rout in routers.values():
