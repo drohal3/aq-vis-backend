@@ -1,0 +1,19 @@
+2023-12-11 intro to FastAPI + authentication https://www.youtube.com/watch?v=5GxQ1rLTwaU
+2024-01-22 solving issues with user/me endpoint (400 and 401 error when logged in from frontend after refactoring)
+           figuring out how to work with pymongo in multiple routers
+2024-02-17 4h - organisation API, models, referencing
+      Problem:  mongoDB generated _id can't be a variable of class in Python - got me stuck until figured out
+2024-02-19 6h - finalized first version of organisation API
+              - example request data for new user
+2024-02-20 8h - admin router
+              - device API base
+              - intro into API testing
+      Problem: database for testing
+      Solution?: multi-stage dockerfile, docker build to run tests
+      Problem: env variables, secrets
+      Idea: GraphQl with strawberry: https://strawberry.rocks/docs/integrations/fastapi
+                                     https://fastapi.tiangolo.com/how-to/graphql/
+              - testing with Frontend + frontend adjustments
+2024-02-21 3h - API errors (frontend and value type causes of the issues)
+              - device API - creating device, saving device IDs in organisation, listing devices by organisation
+2024-02-22 2h - device and unit API

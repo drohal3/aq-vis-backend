@@ -1,0 +1,31 @@
+services:
+   backend:
+     image: backend
+     ports:
+       - 8000:8000
+     build:
+       context: app
+       dockerfile: Dockerfile
+     volumes: # Declare the volume
+       - ./app/:/app/
+     container_name: app-backend
+   mongo:
+     image: mongo
+     container_name: mongo
+     ports:
+       - 3456:27017
+     environment:
+       MONGO_INITDB_ROOT_USERNAME: root
+       MONGO_INITDB_ROOT_PASSWORD: example
+       MONGO_INITDB_DATABASE: the_database
+     volumes:
+       - ./mongo_data:/data/db # to persist data even after stopping and rerunning container / storing data outside of container
+   nginx:
+     image: nginx:1.20.1
+     volumes:
+       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+     ports:
+       - 8080:80
+     container_name: reverse-proxy
+     depends_on:
+       - backend
