@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from src.utils import config, DotEnvConfig, database
+from src.utils import config, DotEnvConfig, mongo_db
 from src.models.auth import Token, TokenData
 from src.models.user import (User, UnsecureUser, NewUser)
 
@@ -79,7 +79,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    user = get_user(database, username=token_data.username)
+    user = get_user(mongo_db.get_database(), username=token_data.username)
     # TODO: for database, dependency injection as in cases above or not?
     if user is None:
         # print("no user")
