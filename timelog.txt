@@ -19,3 +19,4 @@
 2024-02-22 2h - device and unit API
 2024-02-27 8h - env variables, refactoring, preparations for CI/DI
               - fixed depracated code, switch to test database for pytest
+              - improved Dockerfile
