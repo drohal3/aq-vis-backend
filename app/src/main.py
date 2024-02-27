@@ -74,20 +74,6 @@ routers = {
     }
 }
 
-app = FastAPI()
-for router in routers.values():
-    app.include_router(router.get('router'), prefix=router.get('prefix'), tags=router.get('tags'))
-
-
-# Allow all origins in development, TODO: adjust accordingly for production
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database_name = config.get_database_name()
@@ -113,3 +99,16 @@ async def lifespan(app: FastAPI):
     app.mongodb_client.close()
     logging.info("Connected to the MongoDB database closed!")
 
+app = FastAPI(lifespan=lifespan)
+for router in routers.values():
+    app.include_router(router.get('router'), prefix=router.get('prefix'), tags=router.get('tags'))
+
+
+# Allow all origins in development, TODO: adjust accordingly for production
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
