@@ -1,5 +1,6 @@
 # Authentication tutorial: https://github.com/techwithtim/Fast-API-Tutorial/blob/main/main.py
 # FastAPI tutorial: https://www.youtube.com/watch?v=XnYYwcOfcn8&list=PLqAmigZvYxIL9dnYeZEhMoHcoP4zop8-p
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -87,8 +88,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_db_client():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     database_name = config.get_database_name()
     database_url = config.get_config("MONGODB_CONNECTION_URI")
 
@@ -108,10 +109,7 @@ async def startup_db_client():
             continue
         r.database = app.database
     logging.info(f"Connected to the MongoDB database {database.name}!")
-
-@app.on_event("shutdown")
-def shutdown_db_client():
+    yield
     app.mongodb_client.close()
     logging.info("Connected to the MongoDB database closed!")
-
 
