@@ -2,6 +2,8 @@
 This app was completed as part of [Full-stack open](fullstackopen.com/en/) course. Additionally, the created solution aims to serve as a useful tool for [IdealAQ](https://idealaq.com/) project with a potential to be the base or a case study for future production version of the web app.
 
 ## Instructions
+> The name of the container (app-backend) might not me the same. Verify using `docker container ls`.
+
 To run the backend locally, run 
 ```bash
 docker-compose -f ./docker-compose.dev.yml up
