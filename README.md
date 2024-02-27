@@ -10,5 +10,8 @@ To open Swagger UI (for API documentation), visit http://127.0.0.1:8080/docs
 
 To run tests, run while running backend in container: 
 ```bash
-
+docker exec -it app-backend /bin/bash pytest
 ```
+
+## Environment
+

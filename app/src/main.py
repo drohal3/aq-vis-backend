@@ -9,6 +9,9 @@ from src.api import measurements_router, user_router, auth_router, devices_route
 from src.api.admin.admin import admin_router
 
 import logging
+from dotenv import load_dotenv
+
+# load variables from .env to the environment
 
 # from fastapi.security import OAuth2PasswordBearer
 # from typing import Annotated

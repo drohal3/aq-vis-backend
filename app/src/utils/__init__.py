@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import os
 
 from src.utils.config import (
     DotEnvConfig
@@ -6,11 +7,10 @@ from src.utils.config import (
 
 config = DotEnvConfig()
 
-environment = config.get_config("ENVIRONMENT")
+environment = os.getenv("ENVIRONMENT")
 
-database_name = config.get_config("DB_NAME_TEST") \
-    if environment == "test" \
-    else config.get_config("DB_NAME")
+database_name = config.get_database_name()
+print(f"Database name: {database_name} aaa")
 database_url = config.get_config("MONGODB_CONNECTION_URI")
 
 database_client = MongoClient(database_url)
