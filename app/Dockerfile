@@ -4,7 +4,11 @@ COPY . /app
 # CMake is needed to build and install awscrt from source
 #RUN apt-get update && apt-get -y install cmake
 
-RUN pip install -r ./requirements.txt
+RUN pip install -r ./requirements.txt &&\
+    adduser --system --group appuser &&\
+    chown appuser .
+
+USER appuser
 
 EXPOSE 8000
 
