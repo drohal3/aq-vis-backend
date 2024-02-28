@@ -1,12 +1,12 @@
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status
 
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from src.utils import config, DotEnvConfig, mongo_db
-from src.models.auth import Token, TokenData
-from src.models.user import User, UnsecureUser, NewUser
+from src.models.auth import TokenData
+from src.models.user import UnsecureUser
 
 import logging
 

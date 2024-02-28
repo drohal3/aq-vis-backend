@@ -1,5 +1,7 @@
-# Authentication tutorial: https://github.com/techwithtim/Fast-API-Tutorial/blob/main/main.py
-# FastAPI tutorial: https://www.youtube.com/watch?v=XnYYwcOfcn8&list=PLqAmigZvYxIL9dnYeZEhMoHcoP4zop8-p
+# Authentication tutorial:
+# https://github.com/techwithtim/Fast-API-Tutorial/blob/main/main.py
+# FastAPI tutorial:
+# https://www.youtube.com/watch?v=XnYYwcOfcn8&list=PLqAmigZvYxIL9dnYeZEhMoHcoP4zop8-p
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -17,7 +19,6 @@ from src.api import (
 from src.api.admin.admin import admin_router
 
 import logging
-from dotenv import load_dotenv
 
 # load variables from .env to the environment
 

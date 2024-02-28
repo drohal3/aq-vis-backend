@@ -1,5 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
-from bson import ObjectId
+from pydantic import BaseModel
 
 
 class Organisation(BaseModel):

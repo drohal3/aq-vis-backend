@@ -1,5 +1,5 @@
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from src.models.organisation import NewOrganisation, OrganisationInDB
 from src.utils import mongo_db
 import logging

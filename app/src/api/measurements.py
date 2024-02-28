@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 import boto3
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 from src.utils.config import DotEnvConfig
 from src.dependencies.authentication import get_current_active_user
 from src.models.user import User

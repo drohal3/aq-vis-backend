@@ -5,7 +5,9 @@ import jwt
 JWT_SECRET = "some_secret"
 JWT_ALGORITHM = "HS512"
 
-# TODO: https://github.com/testdrivenio/fastapi-jwt/blob/main/app/auth/auth_handler.py
+
+# TODO:
+#  https://github.com/testdrivenio/fastapi-jwt/blob/main/app/auth/auth_handler.py
 
 
 def token_response(token: str):
@@ -27,5 +29,5 @@ def decodeJWT(token: str) -> dict:
         return (
             decoded_token if decoded_token["expires"] >= time.time() else None
         )
-    except:
+    except Exception:
         return {}

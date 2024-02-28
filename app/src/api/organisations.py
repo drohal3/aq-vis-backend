@@ -1,15 +1,13 @@
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 
 from src.dependencies.authentication import (
-    get_password_hash,
     get_current_active_user,
 )
 from src.models.organisation import OrganisationInDB
-from src.models.user import User, NewUser
+from src.models.user import User
 from src.utils import mongo_db
 
-import logging
 
 router = APIRouter()
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 from src.api.admin.organisations import router as organisations_router
 from src.api.admin.users import router as users_router
 
