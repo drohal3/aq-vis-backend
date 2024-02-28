@@ -17,3 +17,6 @@
 2024-02-21 3h - API errors (frontend and value type causes of the issues)
               - device API - creating device, saving device IDs in organisation, listing devices by organisation
 2024-02-22 2h - device and unit API
+2024-02-27 8h - env variables, refactoring, preparations for CI/DI
+              - fixed depracated code, switch to test database for pytest
+              - improved Dockerfile

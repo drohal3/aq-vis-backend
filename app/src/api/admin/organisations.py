@@ -1,7 +1,7 @@
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from src.models.organisation import NewOrganisation, OrganisationInDB
-from src.utils import database
+from src.utils import mongo_db
 import logging
 
 router = APIRouter()
@@ -10,6 +10,7 @@ router = APIRouter()
 
 @router.post("/", response_model=OrganisationInDB)
 async def create_organisation(form_data: NewOrganisation):
+    database = mongo_db.get_database()
     data = form_data.model_dump()
     logging.info(f"Creating organisation: {data}")
     organisation_id = database.organisations.insert_one(data).inserted_id
@@ -23,6 +24,7 @@ async def create_organisation(form_data: NewOrganisation):
 
 @router.put("/", response_model=OrganisationInDB)
 async def update_organisation(form_data: OrganisationInDB):
+    database = mongo_db.get_database()
     # TODO: authenticate
     organisation_id = form_data.id
     data = form_data.model_dump()
@@ -35,6 +37,7 @@ async def update_organisation(form_data: OrganisationInDB):
 
 @router.delete("/{id}")
 async def delete_organisation(id: str):
+    database = mongo_db.get_database()
     # TODO: authenticate
     database.organisations.delete_one({"_id": ObjectId(id)})
     # TODO: delete organisation's devices
@@ -42,6 +45,7 @@ async def delete_organisation(id: str):
 
 @router.get("/{id}", response_model=OrganisationInDB)
 async def get_organisation(id: str):
+    database = mongo_db.get_database()
     organisation = database.organisations.find_one({"_id": ObjectId(id)})
 
     logging.debug(organisation)
@@ -56,6 +60,7 @@ async def get_organisation(id: str):
 
 @router.get("/", response_model=list[OrganisationInDB])
 async def get_organisations():
+    database = mongo_db.get_database()
     organisations = database.organisations.find()
     ret = []
     for organisation in organisations:

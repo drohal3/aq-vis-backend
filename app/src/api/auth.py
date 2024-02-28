@@ -10,6 +10,7 @@ from src.dependencies.authentication import (
 )
 from datetime import timedelta
 from src.utils.config import DotEnvConfig
+from src.utils import mongo_db
 
 router = APIRouter()
 config = DotEnvConfig()
@@ -18,7 +19,7 @@ config = DotEnvConfig()
 async def login_for_token(form_data: OAuth2PasswordRequestForm = Depends()):
     # TODO: use _id instead of username!
     logging.debug("login_for_token()")
-    db = router.database
+    db = mongo_db.get_database()
     user = authenticate_user(db, form_data.username, form_data.password)
     print(user)
     if not user:

@@ -1,14 +1,18 @@
 # Authentication tutorial: https://github.com/techwithtim/Fast-API-Tutorial/blob/main/main.py
 # FastAPI tutorial: https://www.youtube.com/watch?v=XnYYwcOfcn8&list=PLqAmigZvYxIL9dnYeZEhMoHcoP4zop8-p
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.utils import config, DotEnvConfig, database_client, database
+from src.utils import config, DotEnvConfig, mongo_db
 from src.api import measurements_router, user_router, auth_router, devices_router, organisations_router, units_router
 from src.api.admin.admin import admin_router
 
 import logging
+from dotenv import load_dotenv
+
+# load variables from .env to the environment
 
 # from fastapi.security import OAuth2PasswordBearer
 # from typing import Annotated
@@ -70,7 +74,32 @@ routers = {
     }
 }
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    database_name = config.get_database_name()
+    database_url = config.get_config("MONGODB_CONNECTION_URI")
+
+    logging.debug(f"Database URL: {database_url}")
+    logging.debug(f"Database Name: {database_name}")
+
+    mongo_db.create_database(database_name, database_url)
+
+    database = mongo_db.get_database()
+    database_client = mongo_db.get_client()
+
+    app.mongodb_client = database_client
+    app.database = database
+    for rout in routers.values():
+        r = rout.get("router", False)
+        if not r:
+            continue
+        r.database = app.database
+    logging.info(f"Connected to the MongoDB database {database.name}!")
+    yield
+    app.mongodb_client.close()
+    logging.info("Connected to the MongoDB database closed!")
+
+app = FastAPI(lifespan=lifespan)
 for router in routers.values():
     app.include_router(router.get('router'), prefix=router.get('prefix'), tags=router.get('tags'))
 
@@ -83,21 +112,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.on_event("startup")
-async def startup_db_client():
-    app.mongodb_client = database_client
-    app.database = database
-    for rout in routers.values():
-        r = rout.get("router", False)
-        if not r:
-            continue
-        r.database = app.database
-    logging.info(f"Connected to the MongoDB database {database.name}!")
-
-@app.on_event("shutdown")
-def shutdown_db_client():
-    app.mongodb_client.close()
-    logging.info("Connected to the MongoDB database closed!")
-
-

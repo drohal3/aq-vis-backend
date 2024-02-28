@@ -1,19 +1,16 @@
-FROM python:3.11 as test
+FROM python:3.11
 WORKDIR /app
 COPY . /app
 # CMake is needed to build and install awscrt from source
 #RUN apt-get update && apt-get -y install cmake
 
-RUN pip install -r ./requirements.txt
-RUN pip install -r ./requirements_dev.txt
-RUN pytest
+RUN pip install -r ./requirements.txt &&\
+    adduser --system --group appuser &&\
+    chown appuser .
 
-FROM python:3.11 as production
-# Expose port 8000, which is the default port for Uvicorn
+USER appuser
+
 EXPOSE 8000
 
-WORKDIR /app
-COPY . /app
-
-RUN pip install -r ./requirements.txt
+# No need for multi-stage build in python
 CMD ["uvicorn", "src.main:app", "--reload", "--host=backend"]

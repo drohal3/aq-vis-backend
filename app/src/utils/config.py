@@ -1,6 +1,5 @@
+from dotenv import load_dotenv
 import os
-
-from dotenv import dotenv_values
 
 class DotEnvConfig:
     ENV_AUTH_SECRET_KEY = "SECRET_KEY"
@@ -11,13 +10,17 @@ class DotEnvConfig:
     ENV_AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
     ENV_AWS_REGION_NAME = "AWS_REGION_NAME"
 
-    def __init__(self):
-        self.config = {
-            **dotenv_values(".env")
-        }
+    ENV_DB_NAME = "DB_NAME"
+    ENV_DB_NAME_TEST = "DB_NAME_TEST"
+    PYTEST_CURRENT_TEST = "PYTEST_CURRENT_TEST"
 
-        print(f"dotenv: {self.config}")
+    def __init__(self):
+        load_dotenv(".env")
 
     def get_config(self, key):
-        return self.config[key]
+        return os.getenv(key)
 
+    def get_database_name(self):
+        return self.get_config(self.ENV_DB_NAME) \
+            if not self.get_config(self.PYTEST_CURRENT_TEST) \
+            else self.get_config(self.ENV_DB_NAME_TEST)
