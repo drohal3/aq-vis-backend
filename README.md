@@ -15,6 +15,11 @@ To run tests, run while running backend in container:
 docker exec -it app-backend /bin/bash pytest
 ```
 
+To check linting, run while running backend in container:
+```bash
+docker exec -it app-backend flake8 .
+```
+
 ## Environment Variables
 - `MONGODB_CONNECTION_URI`: Connection URL for mongo db
 - `DB_NAME`: Name of database

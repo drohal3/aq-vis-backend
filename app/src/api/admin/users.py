@@ -1,13 +1,16 @@
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter
 
-from src.dependencies.authentication import get_password_hash, get_current_active_user
+from src.dependencies.authentication import (
+    get_password_hash,
+)
 from src.models.user import User, NewUser
 from src.utils import mongo_db
 
 import logging
 
 router = APIRouter()
+
 
 @router.post("/", response_model=User)
 async def create_user(form_data: NewUser):
@@ -28,8 +31,10 @@ async def create_user(form_data: NewUser):
 
     return user
 
+
 @router.put("/", response_model=User)
 async def update_user(form_data: User):
+    database = mongo_db.get_database()
     data = form_data.model_dump()
     user_id = data["id"]
 

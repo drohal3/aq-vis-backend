@@ -1,31 +1,36 @@
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status
 
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from src.utils import config, DotEnvConfig, mongo_db
-from src.models.auth import Token, TokenData
-from src.models.user import (User, UnsecureUser, NewUser)
+from src.models.auth import TokenData
+from src.models.user import UnsecureUser
 
 import logging
 
 
 SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
 ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
-ACCESS_TOKEN_EXPIRE_MINUTES = config.get_config(DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+ACCESS_TOKEN_EXPIRE_MINUTES = config.get_config(
+    DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES
+)
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
 
 def get_password_hash(password):
     return pwd_context.hash(password)
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def create_access_token(data: dict, expires_delta: timedelta or None = None):
     to_encode = data.copy()
@@ -39,8 +44,10 @@ def create_access_token(data: dict, expires_delta: timedelta or None = None):
 
     return encoded_jwt
 
+
 def create_refresh_token():
     pass
+
 
 def get_user(db, username: str) -> UnsecureUser or None:
     logging.debug(f"get_user() - username: {username}")
@@ -51,6 +58,7 @@ def get_user(db, username: str) -> UnsecureUser or None:
 
     user["id"] = str(user["_id"])
     return UnsecureUser(**user)
+
 
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username)
@@ -63,8 +71,13 @@ def authenticate_user(db, username: str, password: str):
 
     return user
 
+
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         # print(f"token: {token}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -87,7 +100,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
     return user
 
-async def get_current_active_user(current_user: UnsecureUser = Depends(get_current_user)):
+
+async def get_current_active_user(
+    current_user: UnsecureUser = Depends(get_current_user),
+):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
 

@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field
+
 
 class UserBase(BaseModel):
     username: str
@@ -21,11 +22,14 @@ class UserBase(BaseModel):
         }
     }
 
+
 class User(UserBase):
     id: str
 
+
 class UnsecureUser(User):
     hashed_password: str
+
 
 class NewUser(UserBase):
     password: str
@@ -42,5 +46,3 @@ class NewUser(UserBase):
             ]
         }
     }
-
-

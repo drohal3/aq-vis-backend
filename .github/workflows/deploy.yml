@@ -1,14 +1,42 @@
-name: DevOps with Docker exercise
+name: Deployment pipeline
 
 on:
   push:
-    branches:
-      - main
-
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize ]
 jobs:
+  pipeline:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./app
+    env:
+      SECRET_KEY: "somesecretkeyfortesting"
+      ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          architecture: 'x64' # verify!
+      - name: Install dependencies
+        run: pip install -r ./requirements.txt
+      - name: Install dev dependencies
+        run: pip install -r ./requirements_dev.txt
+      - name: Lint check with flake8
+        run: flake8 .
+      - name: Test with pytest
+        run: pytest
   publish-docker-hub:
     name: Publish image to Docker Hub
-    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
+    needs: [ pipeline ]
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout to the repository
         uses: actions/checkout@v4 # checkout to the repository
