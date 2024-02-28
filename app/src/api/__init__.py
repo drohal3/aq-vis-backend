@@ -11,5 +11,5 @@ __all__ = [
     "measurements_router",
     "organisations_router",
     "units_router",
-    "user_router"
+    "user_router",
 ]

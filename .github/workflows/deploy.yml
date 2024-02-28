@@ -28,6 +28,8 @@ jobs:
         run: pip install -r ./requirements.txt
       - name: Install dev dependencies
         run: pip install -r ./requirements_dev.txt
+      - name: Lint check with flake8
+        run: flake8 .
       - name: Test with pytest
         run: pytest
   publish-docker-hub:

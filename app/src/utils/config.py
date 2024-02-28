@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 
+
 class DotEnvConfig:
     ENV_AUTH_SECRET_KEY = "SECRET_KEY"
     ENV_AUTH_ALGORITHM = "ALGORITHM"
@@ -21,6 +22,8 @@ class DotEnvConfig:
         return os.getenv(key)
 
     def get_database_name(self):
-        return self.get_config(self.ENV_DB_NAME) \
-            if not self.get_config(self.PYTEST_CURRENT_TEST) \
+        return (
+            self.get_config(self.ENV_DB_NAME)
+            if not self.get_config(self.PYTEST_CURRENT_TEST)
             else self.get_config(self.ENV_DB_NAME_TEST)
+        )
