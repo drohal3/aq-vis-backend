@@ -77,7 +77,17 @@ async def delete_device(
     device = database.devices.find_one({"_id": ObjectId(id)})
     if not device:
         raise HTTPException(status_code=404, detail="Device not found!")
-    if not current_user.organisation == str(device["organisation"]):
+    organisation_id = str(device["organisation"])
+    if not current_user.organisation == organisation_id:
         raise HTTPException(status_code=401, detail="Unauthorized!")
-
+    organisation = database.organisations.find_one({"_id": ObjectId(organisation_id)})
+    devices_in_organisation = organisation["devices"]
+    filtered_devices_in_organisation = []
+    for device in devices_in_organisation:
+        if str(device) != id:
+            filtered_devices_in_organisation.append(device)
+    logging.debug(f"Deleting device from organisation {devices_in_organisation}")
+    logging.debug(f"Filtered: {filtered_devices_in_organisation}")
+    database.organisations.update_one({"_id": ObjectId(organisation_id)},
+                                      {"$set": {"devices": filtered_devices_in_organisation}})
     database.devices.delete_one({"_id": ObjectId(id)})
