@@ -20,3 +20,6 @@
 2024-02-27 8h - env variables, refactoring, preparations for CI/DI
               - fixed depracated code, switch to test database for pytest
               - improved Dockerfile
+2024-02-28 3h - deployment pipeline
+                - deployed to Dockerhub on merge to main branch
+                - test and lint on pull request
