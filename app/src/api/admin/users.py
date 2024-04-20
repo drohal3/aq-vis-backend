@@ -1,35 +1,19 @@
 from bson import ObjectId
 from fastapi import APIRouter
 
-from src.dependencies.authentication import (
-    get_password_hash,
-)
 from src.models.user import User, NewUser
 from src.utils import mongo_db
-
-import logging
+from src.database.operations.user import create_user as create_user_operation
 
 router = APIRouter()
 
 
 @router.post("/", response_model=User)
 async def create_user(form_data: NewUser):
+    # TODO: database to DI (Depends)
     database = mongo_db.get_database()
-    password = form_data.password
-    hashed_password = get_password_hash(password)
 
-    new_user_data = form_data.model_dump()
-    new_user_data.pop("password")
-    new_user_data["hashed_password"] = hashed_password
-    user_id = database.users.insert_one(new_user_data).inserted_id
-    logging.debug(f"create_user() - user_id: {user_id}")
-    user = database.users.find_one({"_id": user_id})
-
-    logging.info(f"create_user() - created user: {user}")
-
-    user["id"] = str(user["_id"])
-
-    return user
+    return create_user_operation(database, form_data)
 
 
 @router.put("/", response_model=User)
@@ -45,3 +29,8 @@ async def update_user(form_data: User):
     updated_user["id"] = str(updated_user["_id"])
 
     return updated_user
+
+@router.delete("/{id}")
+async def delete_user():
+    database = mongo_db.get_database()
+

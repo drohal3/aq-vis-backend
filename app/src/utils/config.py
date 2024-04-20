@@ -13,6 +13,10 @@ class DotEnvConfig:
 
     ENV_DB_NAME = "DB_NAME"
     ENV_DB_NAME_TEST = "DB_NAME_TEST"
+
+    ENV_DB_CONNECTION_URL = "MONGODB_CONNECTION_URI"
+    ENV_DB_CONNECTION_URL_TEST = "MONGODB_CONNECTION_URI_TEST"
+
     PYTEST_CURRENT_TEST = "PYTEST_CURRENT_TEST"
 
     def __init__(self):
@@ -26,4 +30,11 @@ class DotEnvConfig:
             self.get_config(self.ENV_DB_NAME)
             if not self.get_config(self.PYTEST_CURRENT_TEST)
             else self.get_config(self.ENV_DB_NAME_TEST)
+        )
+
+    def get_connection_url(self):
+        return (
+            self.get_config(self.ENV_DB_CONNECTION_URL)
+            if not self.get_config(self.PYTEST_CURRENT_TEST)
+            else self.get_config(self.ENV_DB_CONNECTION_URL_TEST)
         )
