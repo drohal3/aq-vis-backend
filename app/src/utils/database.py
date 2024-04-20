@@ -19,3 +19,4 @@ class Database:
     # TODO: clean!
     def clean_database(self):
         self.database.users.drop()
+        self.database.organisations.drop()

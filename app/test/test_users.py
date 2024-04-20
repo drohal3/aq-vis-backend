@@ -14,7 +14,7 @@ new_user_json = {
         }
 
 def test_create_user():
-    with TestClient(app) as client:
+    with TestClient(app):
         mongo_db.clean_database()
         database = mongo_db.get_database()
         new_user = create_user(database, NewUser(**new_user_json))
@@ -26,7 +26,7 @@ def test_create_user():
 
 
 def test_delete_user():
-    with TestClient(app) as client:
+    with TestClient(app):
         mongo_db.clean_database()
         database = mongo_db.get_database()
         new_user = create_user(database, NewUser(**new_user_json))

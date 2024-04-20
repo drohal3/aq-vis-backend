@@ -1,6 +1,7 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from src.models.organisation import NewOrganisation, OrganisationInDB
+from src.models.organisation import NewOrganisation, Organisation
+from src.database.operations.organisation import create_organisation as create_organisation_operation
 from src.utils import mongo_db
 import logging
 
@@ -9,25 +10,19 @@ router = APIRouter()
 # TODO: only admins should be allowed to call this API - move to admin area!
 
 
-@router.post("/", response_model=OrganisationInDB)
+@router.post("/", response_model=Organisation)
 async def create_organisation(form_data: NewOrganisation):
     database = mongo_db.get_database()
-    data = form_data.model_dump()
-    logging.info(f"Creating organisation: {data}")
-    organisation_id = database.organisations.insert_one(data).inserted_id
-    created_organisation = database.organisations.find_one(
-        {"_id": ObjectId(organisation_id)}
-    )
+    created_organisation = create_organisation_operation(database, form_data)
 
     # need to rename _id to id since _id is reserved in Python
-    created_organisation["id"] = str(created_organisation["_id"])
     logging.debug(f"Created organisation: {created_organisation}")
 
     return created_organisation
 
 
-@router.put("/", response_model=OrganisationInDB)
-async def update_organisation(form_data: OrganisationInDB):
+@router.put("/", response_model=Organisation)
+async def update_organisation(form_data: Organisation):
     database = mongo_db.get_database()
     # TODO: authenticate
     organisation_id = form_data.id
@@ -52,7 +47,7 @@ async def delete_organisation(id: str):
     # TODO: delete organisation's devices
 
 
-@router.get("/{id}", response_model=OrganisationInDB)
+@router.get("/{id}", response_model=Organisation)
 async def get_organisation(id: str):
     database = mongo_db.get_database()
     organisation = database.organisations.find_one({"_id": ObjectId(id)})
@@ -68,13 +63,13 @@ async def get_organisation(id: str):
     return organisation
 
 
-@router.get("/", response_model=list[OrganisationInDB])
+@router.get("/", response_model=list[Organisation])
 async def get_organisations():
     database = mongo_db.get_database()
     organisations = database.organisations.find()
     ret = []
     for organisation in organisations:
         organisation["id"] = str(organisation["_id"])
-        ret.append(OrganisationInDB(**organisation))
+        ret.append(Organisation(**organisation))
 
     return ret

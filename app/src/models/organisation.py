@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 
-
-class Organisation(BaseModel):
+class OrganisationBase(BaseModel):
     name: str
     devices: list[str] = list
 
 
-class OrganisationInDB(Organisation):
+class Organisation(OrganisationBase):
     id: str
 
 
-class NewOrganisation(Organisation):
+class NewOrganisation(OrganisationBase):
     pass
+
