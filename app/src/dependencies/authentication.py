@@ -33,6 +33,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_access_token(data: dict, expires_delta: timedelta or None = None):
+    # TODO: move to database/operations
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -61,6 +62,7 @@ def get_user(db, username: str) -> UnsecureUser or None:
 
 
 def authenticate_user(db, username: str, password: str):
+    # TODO: move to database/operations
     user = get_user(db, username)
     if not user:
         logging.debug(f"authenticate_user() - username {username} not found")
