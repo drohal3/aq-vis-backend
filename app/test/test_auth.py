@@ -7,7 +7,7 @@ from test.data.user_json import new_user_json
 from src.models.user import NewUser
 
 new_user_data = new_user_json[0]
-def test_auth():
+def test_access_token():
     with TestClient(app):
         mongo_db.clean_database()
         database = mongo_db.get_database()
