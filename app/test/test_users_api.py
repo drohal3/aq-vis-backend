@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from src.main import app
 from src.database.operations.user import create_user
 from src.models.user import NewUser
-from src.utils import mongo_db
+from src.database import get_database, clean_database
 from test.data.user_json import new_user_json
 
 def setup_function():
@@ -10,10 +10,11 @@ def setup_function():
 
 def test_me():
     with TestClient(app) as client:
-        mongo_db.clean_database()
-        database = mongo_db.get_database()
+        clean_database()
+        database = get_database()
         create_user(database, NewUser(**new_user_json[0]))
-        token_response = client.post("/token", data={"username": "string", "password": "string"})
+        token_response = client.post("/token", data={"username": new_user_json[0]["email"], "password": new_user_json[0]["password"]})
+        print(f"Token !!!!!!!!!!!!!!!!: {token_response}")
         token = token_response.json()["access_token"]
         token_type = token_response.json()["token_type"]
 
@@ -31,7 +32,7 @@ def test_me_unauthorized():
 
 def test_create_user_api():
     with TestClient(app) as client:
-        mongo_db.clean_database()
+        clean_database()
         json = {
           "disabled": False,
           "email": "example@test.com",

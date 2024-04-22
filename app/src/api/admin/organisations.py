@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from src.models.organisation import NewOrganisation, Organisation
 from src.database.operations.organisation import create_organisation as create_organisation_operation
-from src.utils import mongo_db
+from src.database import get_database
 import logging
 
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.post("/", response_model=Organisation)
 async def create_organisation(form_data: NewOrganisation):
-    database = mongo_db.get_database()
+    database = get_database()
     created_organisation = create_organisation_operation(database, form_data)
 
     # need to rename _id to id since _id is reserved in Python
@@ -23,7 +23,7 @@ async def create_organisation(form_data: NewOrganisation):
 
 @router.put("/", response_model=Organisation)
 async def update_organisation(form_data: Organisation):
-    database = mongo_db.get_database()
+    database = get_database()
     # TODO: authenticate
     organisation_id = form_data.id
     data = form_data.model_dump()
@@ -41,7 +41,7 @@ async def update_organisation(form_data: Organisation):
 
 @router.delete("/{id}")
 async def delete_organisation(id: str):
-    database = mongo_db.get_database()
+    database = get_database()
     # TODO: authenticate
     database.organisations.delete_one({"_id": ObjectId(id)})
     # TODO: delete organisation's devices
@@ -49,7 +49,7 @@ async def delete_organisation(id: str):
 
 @router.get("/{id}", response_model=Organisation)
 async def get_organisation(id: str):
-    database = mongo_db.get_database()
+    database = get_database()
     organisation = database.organisations.find_one({"_id": ObjectId(id)})
 
     logging.debug(organisation)
@@ -65,7 +65,7 @@ async def get_organisation(id: str):
 
 @router.get("/", response_model=list[Organisation])
 async def get_organisations():
-    database = mongo_db.get_database()
+    database = get_database()
     organisations = database.organisations.find()
     ret = []
     for organisation in organisations:

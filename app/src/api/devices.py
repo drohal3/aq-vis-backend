@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.dependencies.authentication import get_current_active_user
 from src.models.device import Device, NewDevice
 from src.models.user import User
-from src.utils import mongo_db
+from src.database import get_database
 
 import logging
 
@@ -15,7 +15,7 @@ router = APIRouter()
 async def create_device(
     form_data: NewDevice, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     organisation_id = form_data.organisation
     organisation = database.organisations.find_one(
         {"_id": ObjectId(organisation_id)}
@@ -46,7 +46,7 @@ async def create_device(
 async def get_devices(
     organisation: str, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     organisation = database.organisations.find_one(
         {"_id": ObjectId(organisation)}
     )
@@ -72,7 +72,7 @@ async def get_devices(
 async def delete_device(
     id: str, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     logging.debug(f"Deleting device {id}")
     device = database.devices.find_one({"_id": ObjectId(id)})
     if not device:

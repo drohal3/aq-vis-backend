@@ -7,7 +7,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.utils import config, DotEnvConfig, mongo_db
+from src.utils import config, DotEnvConfig
+from src.database import mongo_db
 from src.api import (
     measurements_router,
     user_router,

@@ -6,7 +6,7 @@ from src.dependencies.authentication import (
 )
 from src.models.organisation import Organisation
 from src.models.user import User
-from src.utils import mongo_db
+from src.database import get_database
 from src.database.operations.organisation import find_organisation, create_organisation
 
 
@@ -17,7 +17,7 @@ router = APIRouter()
 async def get_organisation(
     organisation_id: str, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     if not current_user.organisation == str(organisation_id):
         raise HTTPException(401, detail="Unauthorized!")
 

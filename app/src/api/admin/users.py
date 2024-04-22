@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter
 
 from src.models.user import User, NewUser
-from src.utils import mongo_db
+from src.database import get_database
 from src.database.operations.user import create_user as create_user_operation
 
 router = APIRouter()
@@ -11,14 +11,14 @@ router = APIRouter()
 @router.post("/", response_model=User)
 async def create_user(form_data: NewUser):
     # TODO: database to DI (Depends)
-    database = mongo_db.get_database()
+    database = get_database()
 
     return create_user_operation(database, form_data)
 
 
 @router.put("/", response_model=User)
 async def update_user(form_data: User):
-    database = mongo_db.get_database()
+    database = get_database()
     data = form_data.model_dump()
     user_id = data["id"]
 
@@ -32,5 +32,5 @@ async def update_user(form_data: User):
 
 @router.delete("/{id}")
 async def delete_user():
-    database = mongo_db.get_database()
+    database = get_database()
 

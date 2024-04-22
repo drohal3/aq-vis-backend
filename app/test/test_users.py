@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from src.main import app
 from src.database.operations.user import create_user, find_user, delete_user
-from src.utils import mongo_db
+from src.database import get_database, clean_database
 from src.models.user import NewUser
 from bson import ObjectId
 from test.data.user_json import new_user_json
@@ -9,8 +9,8 @@ from test.data.user_json import new_user_json
 
 def test_create_user():
     with TestClient(app):
-        mongo_db.clean_database()
-        database = mongo_db.get_database()
+        clean_database()
+        database = get_database()
         new_user = create_user(database, NewUser(**new_user_json[0]))
         new_user_id = new_user["id"]
 
@@ -21,8 +21,8 @@ def test_create_user():
 
 def test_delete_user():
     with TestClient(app):
-        mongo_db.clean_database()
-        database = mongo_db.get_database()
+        clean_database()
+        database = get_database()
         new_user = create_user(database, NewUser(**new_user_json[0]))
         new_user_id = new_user["id"]
 
