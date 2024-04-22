@@ -6,10 +6,18 @@ import logging
 from src.dependencies.authentication import (
     get_password_hash,
 )
-from src.models.user import User, NewUser
+from src.models.user import User, NewUser, UnsecureUser
 
 def find_user(database: Database, user_id: ObjectId) -> User | None:
-    user = database.users.find_one({"_id": user_id})
+    user = database.users.find_one({"_id": user_id}, {"hashed_password": 0})
+    if user is None:
+        return user
+    user["id"] = str(user["_id"])
+
+    return user
+
+def find_unsecure_user_by_email(database: Database, email: str) -> UnsecureUser | None:
+    user = database.users.find_one({"email": email})
     if user is None:
         return user
     user["id"] = str(user["_id"])
