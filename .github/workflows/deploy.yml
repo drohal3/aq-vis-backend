@@ -17,6 +17,8 @@ jobs:
       SECRET_KEY: "somesecretkeyfortesting"
       ALGORITHM: "HS256"
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      MONGODB_CONNECTION_URI_TEST: ${{ secrets.MONGODB_CONNECTION_URI_TEST }}
+      DB_NAME_TEST: ${{ secrets.DB_NAME_TEST }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
