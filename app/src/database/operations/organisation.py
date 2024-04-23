@@ -26,10 +26,10 @@ def create_organisation(database: Database, organisation_data: NewOrganisation) 
 def delete_organisation(database: Database, organisation_id: ObjectId):
     database.organisations.delete_one({"_id": organisation_id})
 
-def add_membership(database: Database, organisation_id, membership: OrganisationMembership):
+def add_membership(database: Database, organisation_id: ObjectId, membership: OrganisationMembership):
     membership_data = membership.model_dump()
     print(f"======> membership: {membership_data}")
-    organisation = find_organisation(database, ObjectId(organisation_id))
+    organisation = find_organisation(database, organisation_id)
     print(f"======> organisation: {organisation}")
     members = organisation["members"]
     members.append(membership_data)

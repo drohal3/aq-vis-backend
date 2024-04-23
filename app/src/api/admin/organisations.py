@@ -1,6 +1,6 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from src.models.organisation import NewOrganisation, Organisation, NewOrganisationMembership, OrganisationMembership
+from src.models.organisation import NewOrganisation, Organisation, NewOrganisationMembership, OrganisationMembership, OrganisationMembershipBase
 from src.database.operations.organisation import create_organisation as create_organisation_operation, add_membership as add_membership_operation, remove_membership as remove_membership_operation
 from src.database.operations.user import add_organisation as add_organisation_operation, remove_organisation as remove_organisation_operation
 from src.database import get_database
@@ -8,7 +8,7 @@ import logging
 
 router = APIRouter()
 
-@router.post("/", response_model=Organisation)
+@router.post("/", response_model=Organisation, status_code=201)
 async def create_organisation(form_data: NewOrganisation):
     database = get_database()
     created_organisation = create_organisation_operation(database, form_data)
@@ -37,7 +37,7 @@ async def update_organisation(form_data: Organisation):
     return updated_organisation
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=204)
 async def delete_organisation(id: str):
     database = get_database()
     # TODO: authenticate
@@ -80,7 +80,7 @@ async def add_user(form_data: NewOrganisationMembership):
     user_id = data["user"]
     organisation_id = data["organisation"]
     add_organisation_operation(database, ObjectId(user_id), ObjectId(organisation_id))
-    add_membership_operation(database, organisation_id, OrganisationMembership(**data))
+    add_membership_operation(database, ObjectId(organisation_id), OrganisationMembership(**data))
 
 @router.post("/remove_user")
 async def remove_user(form_data: NewOrganisationMembership):

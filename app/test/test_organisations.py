@@ -28,3 +28,5 @@ def test_delete_organisation():
         delete_organisation(database, ObjectId(new_organisation_id))
         organisation = find_organisation(database, ObjectId(new_organisation_id))
         assert organisation is None
+
+
