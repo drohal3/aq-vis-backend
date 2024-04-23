@@ -28,12 +28,9 @@ def delete_organisation(database: Database, organisation_id: ObjectId):
 
 def add_membership(database: Database, organisation_id: ObjectId, membership: OrganisationMembership):
     membership_data = membership.model_dump()
-    print(f"======> membership: {membership_data}")
     organisation = find_organisation(database, organisation_id)
-    print(f"======> organisation: {organisation}")
     members = organisation["members"]
     members.append(membership_data)
-    print(f"members: {members}")
 
     # TODO: if user already a member?
     database.organisations.update_one({"_id": ObjectId(organisation_id)}, {"$set": {'members': members}})
