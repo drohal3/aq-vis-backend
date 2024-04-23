@@ -11,8 +11,13 @@ from fastapi.security import OAuth2PasswordBearer
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
 @router.get("/me", response_model=User)
-async def read_user_me(database: Database = Depends(get_database), token: str = Depends(oauth2_scheme)):
+async def read_user_me(
+    database: Database = Depends(get_database),
+    token: str = Depends(oauth2_scheme),
+):
     return get_current_active_user(database, token)
 
 

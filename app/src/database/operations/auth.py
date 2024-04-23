@@ -19,10 +19,15 @@ ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
 ACCESS_TOKEN_EXPIRE_MINUTES = config.get_config(
     DotEnvConfig.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES
 )
+
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def _create_access_token(data: dict, expires_delta: timedelta or None = None) -> str:
+
+def _create_access_token(
+    data: dict, expires_delta: timedelta or None = None
+) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -34,17 +39,21 @@ def _create_access_token(data: dict, expires_delta: timedelta or None = None) ->
 
     return encoded_jwt
 
-def create_login_access_token(database, email, expires_delta: timedelta or None = None):
+
+def create_login_access_token(
+    database, email, expires_delta: timedelta or None = None
+):
     # TODO: token can be stored in database so it can be invalidated
     data = {"sub": email}
 
     return _create_access_token(data, expires_delta)
 
+
 def get_auth_user(database, email: str, password: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid email or password.",
-        headers={"WWW-Authenticate": "Bearer"}
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
     user = find_unsecure_user_by_email(database, email)
@@ -56,6 +65,7 @@ def get_auth_user(database, email: str, password: str):
         raise credentials_exception
 
     return user
+
 
 def get_current_user(database, token: str):
     credentials_exception = HTTPException(
@@ -79,7 +89,10 @@ def get_current_user(database, token: str):
 
     return user
 
-def get_current_active_user(database=Depends(get_database), token: str = Depends(oauth2_scheme)):
+
+def get_current_active_user(
+    database=Depends(get_database), token: str = Depends(oauth2_scheme)
+):
     current_user = get_current_user(database, token)
     logging.info(f"current_user haaaaaa: {current_user}")
     if current_user["disabled"]:

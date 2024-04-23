@@ -9,6 +9,7 @@ from src.dependencies.authentication import (
 
 from src.models.user import User, NewUser, UnsecureUser
 
+
 def find_user(database: Database, user_id: ObjectId) -> User | None:
     user = database.users.find_one({"_id": user_id}, {"hashed_password": 0})
     if user is None:
@@ -17,13 +18,17 @@ def find_user(database: Database, user_id: ObjectId) -> User | None:
 
     return user
 
-def find_unsecure_user_by_email(database: Database, email: str) -> UnsecureUser | None:
+
+def find_unsecure_user_by_email(
+    database: Database, email: str
+) -> UnsecureUser | None:
     user = database.users.find_one({"email": email})
     if user is None:
         return user
     user["id"] = str(user["_id"])
 
     return user
+
 
 def create_user(database: Database, data: NewUser) -> User:
     password = data.password
@@ -40,12 +45,22 @@ def create_user(database: Database, data: NewUser) -> User:
 
     return user
 
+
 def delete_user(database: Database, user_id: ObjectId):
     database.users.delete_one({"_id": user_id})
 
 
-def add_organisation(database: Database, user_id: ObjectId, organisation_id: ObjectId):
-    database.users.update_one({"_id": user_id}, {"$set": {"organisation": str(organisation_id)}})
+def add_organisation(
+    database: Database, user_id: ObjectId, organisation_id: ObjectId
+):
+    database.users.update_one(
+        {"_id": user_id}, {"$set": {"organisation": str(organisation_id)}}
+    )
 
-def remove_organisation(database: Database, user_id: ObjectId, organisation_id: ObjectId):
-    database.users.update_one({"_id": user_id}, {"$set": {"organisation": None}})
+
+def remove_organisation(
+    database: Database, user_id: ObjectId, organisation_id: ObjectId
+):
+    database.users.update_one(
+        {"_id": user_id}, {"$set": {"organisation": None}}
+    )

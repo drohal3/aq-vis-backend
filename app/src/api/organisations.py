@@ -16,7 +16,7 @@ router = APIRouter()
 async def get_organisation(
     organisation_id: str,
     database: Database = Depends(get_database),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
     if not current_user["organisation"] == str(organisation_id):
         raise HTTPException(401, detail="Unauthorized!")

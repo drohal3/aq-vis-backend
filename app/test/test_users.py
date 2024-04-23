@@ -32,4 +32,5 @@ def test_delete_user():
 
         assert user is None
 
+
 # TODO: def test_update_user():

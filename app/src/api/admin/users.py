@@ -30,7 +30,8 @@ async def update_user(form_data: User):
 
     return updated_user
 
+
 @router.delete("/{id}")
 async def delete_user():
-    database = get_database()
-
+    # database = get_database()
+    pass

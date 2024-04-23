@@ -6,17 +6,25 @@ from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from src.utils.config import DotEnvConfig
 from src.database import get_database
-from src.database.operations.auth import get_auth_user, create_login_access_token
+from src.database.operations.auth import (
+    get_auth_user,
+    create_login_access_token,
+)
 
 router = APIRouter()
 config = DotEnvConfig()
 
 
 @router.post("/token", response_model=Token)
-async def login_for_token(database=Depends(get_database), form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_token(
+    database=Depends(get_database),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
     # TODO: use _id instead of username!
     logging.debug("login_for_token()")
-    user = get_auth_user(database, email=form_data.username, password=form_data.password)
+    user = get_auth_user(
+        database, email=form_data.username, password=form_data.password
+    )
     print(user)
 
     access_token_expires = timedelta(

@@ -1,12 +1,25 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from src.models.organisation import NewOrganisation, Organisation, NewOrganisationMembership, OrganisationMembership, OrganisationMembershipBase
-from src.database.operations.organisation import create_organisation as create_organisation_operation, add_membership as add_membership_operation, remove_membership as remove_membership_operation
-from src.database.operations.user import add_organisation as add_organisation_operation, remove_organisation as remove_organisation_operation
+from src.models.organisation import (
+    NewOrganisation,
+    Organisation,
+    NewOrganisationMembership,
+    OrganisationMembership,
+)
+from src.database.operations.organisation import (
+    create_organisation as create_organisation_operation,
+    add_membership as add_membership_operation,
+    remove_membership as remove_membership_operation,
+)
+from src.database.operations.user import (
+    add_organisation as add_organisation_operation,
+    remove_organisation as remove_organisation_operation,
+)
 from src.database import get_database
 import logging
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Organisation, status_code=201)
 async def create_organisation(form_data: NewOrganisation):
@@ -72,6 +85,7 @@ async def get_organisations():
 
     return ret
 
+
 @router.post("/add_user")
 async def add_user(form_data: NewOrganisationMembership):
     # TODO: auth
@@ -79,8 +93,13 @@ async def add_user(form_data: NewOrganisationMembership):
     data = form_data.model_dump()
     user_id = data["user"]
     organisation_id = data["organisation"]
-    add_organisation_operation(database, ObjectId(user_id), ObjectId(organisation_id))
-    add_membership_operation(database, ObjectId(organisation_id), OrganisationMembership(**data))
+    add_organisation_operation(
+        database, ObjectId(user_id), ObjectId(organisation_id)
+    )
+    add_membership_operation(
+        database, ObjectId(organisation_id), OrganisationMembership(**data)
+    )
+
 
 @router.post("/remove_user")
 async def remove_user(form_data: NewOrganisationMembership):
@@ -88,5 +107,9 @@ async def remove_user(form_data: NewOrganisationMembership):
     data = form_data.model_dump()
     user_id = data["user"]
     organisation_id = data["organisation"]
-    remove_organisation_operation(database, ObjectId(user_id), ObjectId(organisation_id))
-    remove_membership_operation(database, ObjectId(organisation_id), ObjectId(user_id))
+    remove_organisation_operation(
+        database, ObjectId(user_id), ObjectId(organisation_id)
+    )
+    remove_membership_operation(
+        database, ObjectId(organisation_id), ObjectId(user_id)
+    )

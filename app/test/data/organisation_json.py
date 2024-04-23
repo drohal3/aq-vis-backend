@@ -1,5 +1,3 @@
-new_organisation_json = [{
-    "name": "Test Organisation",
-    "devices": [],
-    "members": []
-}]
+new_organisation_json = [
+    {"name": "Test Organisation", "devices": [], "members": []}
+]
