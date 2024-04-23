@@ -1,12 +1,13 @@
 from fastapi.testclient import TestClient
 from src.main import app
-from src.database import get_database, clean_database
+from src.database import clean_database
 
 from test.data.organisation_json import new_organisation_json
 from test.data.user_json import new_user_json
 
 new_organisation_data = new_organisation_json[0]
 new_user_data = new_user_json[0]
+
 def test_create_organisation():
     with TestClient(app) as client:
         clean_database()

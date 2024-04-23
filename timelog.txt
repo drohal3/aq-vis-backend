@@ -27,4 +27,6 @@
        -21      TODO: separate DB operations from api part, i.e.: https://youtu.be/9gC3Ot0LoUQ?si=sh7wmoVm22kLY8UN&t=1175!
                 TODO: use DI (Depends) for database
                 set up test DB, at least temporary, with MongoDB Atlas
-2024-04-22 xh   - 11,20
+2024-04-22 7h   -
+2024-04-23 4h  TODO: place get_db to dependency
+               TODO: in test use dependency override https://fastapi.tiangolo.com/advanced/testing-database/
