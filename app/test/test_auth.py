@@ -12,8 +12,6 @@ from src.models.user import NewUser
 
 new_user_data = new_user_json[0]
 
-def test_fail():
-    assert False == True
 
 def test_access_token():
     with TestClient(app):

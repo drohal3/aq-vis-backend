@@ -66,9 +66,9 @@ jobs:
           context: "{{defaultContext}}:app"
           push: true
           tags: drohal3/cpcvis-backend:latest
-  notify: #
+  notify:
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-#    needs: [ publish-docker-hub ]
+    needs: [ publish-docker-hub ]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -82,6 +82,7 @@ jobs:
           details: Published successfully!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: notify fail
+         #  TODO: fix notify on failure
         if: ${{ !success() }}
         uses: rjstone/discord-webhook-notify@v1
         with:
