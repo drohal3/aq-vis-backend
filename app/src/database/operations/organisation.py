@@ -1,7 +1,7 @@
 from pymongo.database import Database
 from bson import ObjectId
 
-from src.models.organisation import Organisation, NewOrganisation
+from src.models.organisation import Organisation, NewOrganisation, OrganisationMembership
 
 
 def find_organisation(database: Database, organisation_id: ObjectId) -> Organisation | None:
@@ -25,3 +25,24 @@ def create_organisation(database: Database, organisation_data: NewOrganisation) 
 
 def delete_organisation(database: Database, organisation_id: ObjectId):
     database.organisations.delete_one({"_id": organisation_id})
+
+def add_membership(database: Database, organisation_id, membership: OrganisationMembership):
+    membership_data = membership.model_dump()
+    print(f"======> membership: {membership_data}")
+    organisation = find_organisation(database, ObjectId(organisation_id))
+    print(f"======> organisation: {organisation}")
+    members = organisation["members"]
+    members.append(membership_data)
+    print(f"members: {members}")
+
+    # TODO: if user already a member?
+    database.organisations.update_one({"_id": ObjectId(organisation_id)}, {"$set": {'members': members}})
+
+def remove_membership(database: Database, organisation_id: ObjectId, user_id: ObjectId):
+    organisation = find_organisation(database, organisation_id)
+    members = organisation["members"]
+    members_new = []
+    for member in members:
+        if member["user"] != str(user_id):
+            members_new.append(member)
+    database.organisations.update_one({"_id": organisation_id}, {"$set": {'members': members_new}})

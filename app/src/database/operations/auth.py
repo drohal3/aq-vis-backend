@@ -2,14 +2,17 @@ import logging
 
 from passlib.context import CryptContext
 from src.database.operations.user import find_unsecure_user_by_email
+from src.database import get_database
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from src.utils import config, DotEnvConfig
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordBearer
 from src.models.auth import TokenDataE
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 SECRET_KEY = config.get_config(DotEnvConfig.ENV_AUTH_SECRET_KEY)
 ALGORITHM = config.get_config(DotEnvConfig.ENV_AUTH_ALGORITHM)
@@ -77,7 +80,7 @@ def get_current_user(database, token: str):
 
     return user
 
-def get_current_active_user(database, token: str):
+def get_current_active_user(database=Depends(get_database), token: str = Depends(oauth2_scheme)):
     current_user = get_current_user(database, token)
     logging.info(f"current_user haaaaaa: {current_user}")
     if current_user["disabled"]:

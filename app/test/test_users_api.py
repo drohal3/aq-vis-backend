@@ -14,7 +14,6 @@ def test_me():
         database = get_database()
         create_user(database, NewUser(**new_user_json[0]))
         token_response = client.post("/token", data={"username": new_user_json[0]["email"], "password": new_user_json[0]["password"]})
-        print(f"Token !!!!!!!!!!!!!!!!: {token_response}")
         token = token_response.json()["access_token"]
         token_type = token_response.json()["token_type"]
 

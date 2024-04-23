@@ -6,6 +6,7 @@ import logging
 from src.dependencies.authentication import (
     get_password_hash,
 )
+
 from src.models.user import User, NewUser, UnsecureUser
 
 def find_user(database: Database, user_id: ObjectId) -> User | None:
@@ -42,3 +43,9 @@ def create_user(database: Database, data: NewUser) -> User:
 def delete_user(database: Database, user_id: ObjectId):
     database.users.delete_one({"_id": user_id})
 
+
+def add_organisation(database: Database, user_id: ObjectId, organisation_id: ObjectId):
+    database.users.update_one({"_id": user_id}, {"$set": {"organisation": str(organisation_id)}})
+
+def remove_organisation(database: Database, user_id: ObjectId, organisation_id: ObjectId):
+    database.users.update_one({"_id": user_id}, {"$set": {"organisation": None}})

@@ -1,14 +1,12 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from src.models.organisation import NewOrganisation, Organisation
-from src.database.operations.organisation import create_organisation as create_organisation_operation
+from src.models.organisation import NewOrganisation, Organisation, NewOrganisationMembership, OrganisationMembership
+from src.database.operations.organisation import create_organisation as create_organisation_operation, add_membership as add_membership_operation, remove_membership as remove_membership_operation
+from src.database.operations.user import add_organisation as add_organisation_operation, remove_organisation as remove_organisation_operation
 from src.database import get_database
 import logging
 
 router = APIRouter()
-
-# TODO: only admins should be allowed to call this API - move to admin area!
-
 
 @router.post("/", response_model=Organisation)
 async def create_organisation(form_data: NewOrganisation):
@@ -73,3 +71,22 @@ async def get_organisations():
         ret.append(Organisation(**organisation))
 
     return ret
+
+@router.post("/add_user")
+async def add_user(form_data: NewOrganisationMembership):
+    # TODO: auth
+    database = get_database()
+    data = form_data.model_dump()
+    user_id = data["user"]
+    organisation_id = data["organisation"]
+    add_organisation_operation(database, ObjectId(user_id), ObjectId(organisation_id))
+    add_membership_operation(database, organisation_id, OrganisationMembership(**data))
+
+@router.post("/remove_user")
+async def remove_user(form_data: NewOrganisationMembership):
+    database = get_database()
+    data = form_data.model_dump()
+    user_id = data["user"]
+    organisation_id = data["organisation"]
+    remove_organisation_operation(database, ObjectId(user_id), ObjectId(organisation_id))
+    remove_membership_operation(database, ObjectId(organisation_id), ObjectId(user_id))
