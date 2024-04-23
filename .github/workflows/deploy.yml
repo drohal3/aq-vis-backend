@@ -34,19 +34,19 @@ jobs:
         run: flake8 .
       - name: Test with pytest
         run: pytest
-  tag_release:
-    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ pipeline ]
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@1.67.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: false
-          INITIAL_VERSION: 0.0.0 # default
-          DEFAULT_BUMP: patch # by default, increase the last number
+#  tag_release:
+#    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
+#    needs: [ pipeline ]
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Bump version and push tag
+#        uses: anothrNick/github-tag-action@1.67.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          WITH_V: false
+#          INITIAL_VERSION: 0.0.0 # default
+#          DEFAULT_BUMP: patch # by default, increase the last number
   publish-docker-hub:
     name: Publish image to Docker Hub
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
@@ -68,7 +68,7 @@ jobs:
           tags: drohal3/cpcvis-backend:latest
   notify: #
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ publish-docker-hub ]
+#    needs: [ publish-docker-hub ]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
