@@ -6,5 +6,9 @@ class Token(BaseModel):
     token_type: str
 
 
+class TokenDataE(BaseModel):
+    email: str or None = None
+
+
 class TokenData(BaseModel):
     username: str or None = None

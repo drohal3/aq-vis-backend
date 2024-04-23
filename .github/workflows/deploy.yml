@@ -17,6 +17,8 @@ jobs:
       SECRET_KEY: "somesecretkeyfortesting"
       ALGORITHM: "HS256"
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      MONGODB_CONNECTION_URI_TEST: ${{ secrets.MONGODB_CONNECTION_URI_TEST }}
+      DB_NAME_TEST: ${{ secrets.DB_NAME_TEST }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -64,3 +66,27 @@ jobs:
           context: "{{defaultContext}}:app"
           push: true
           tags: drohal3/cpcvis-backend:latest
+  notify: #
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
+    needs: [ publish-docker-hub ]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: notify success
+        if: ${{ success() }}
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          text: New version of cpcvis-backend image published
+          description: By ${{ github.triggering_actor }}
+          details: Published successfully!
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: notify fail
+        if: ${{ !success() }}
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          text: New version of cpcvis-backend image could not be published!
+          description: Triggered by ${{ github.triggering_actor }}, commit urls ${{ join(github.event.commits.*.url, ' , ') }}
+          details: Publishing Failed!
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

@@ -7,7 +7,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.utils import config, DotEnvConfig, mongo_db
+from src.utils import config, DotEnvConfig
+from src.database import mongo_db
 from src.api import (
     measurements_router,
     user_router,
@@ -72,10 +73,10 @@ routers = {
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database_name = config.get_database_name()
-    database_url = config.get_config("MONGODB_CONNECTION_URI")
+    database_url = config.get_connection_url()
 
-    logging.debug(f"Database URL: {database_url}")
-    logging.debug(f"Database Name: {database_name}")
+    print(f"Database URL: {database_url}")
+    print(f"Database Name: {database_name}")
 
     mongo_db.create_database(database_name, database_url)
 

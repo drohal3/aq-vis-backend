@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.dependencies.authentication import get_current_active_user
 from src.models.device import Device, NewDevice
 from src.models.user import User
-from src.utils import mongo_db
+from src.database import get_database
 
 import logging
 
@@ -15,7 +15,7 @@ router = APIRouter()
 async def create_device(
     form_data: NewDevice, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     organisation_id = form_data.organisation
     organisation = database.organisations.find_one(
         {"_id": ObjectId(organisation_id)}
@@ -46,7 +46,7 @@ async def create_device(
 async def get_devices(
     organisation: str, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     organisation = database.organisations.find_one(
         {"_id": ObjectId(organisation)}
     )
@@ -72,7 +72,7 @@ async def get_devices(
 async def delete_device(
     id: str, current_user: User = Depends(get_current_active_user)
 ):
-    database = mongo_db.get_database()
+    database = get_database()
     logging.debug(f"Deleting device {id}")
     device = database.devices.find_one({"_id": ObjectId(id)})
     if not device:
@@ -80,20 +80,22 @@ async def delete_device(
     organisation_id = str(device["organisation"])
     if not current_user.organisation == organisation_id:
         raise HTTPException(status_code=401, detail="Unauthorized!")
-    organisation = (database
-                    .organisations
-                    .find_one({"_id": ObjectId(organisation_id)})
-                    )
+    organisation = database.organisations.find_one(
+        {"_id": ObjectId(organisation_id)}
+    )
     devices_in_organisation = organisation["devices"]
     filtered_devices_in_organisation = []
     for device in devices_in_organisation:
         if str(device) != id:
             filtered_devices_in_organisation.append(device)
     logging.debug(
-        f"Deleting device from organisation {devices_in_organisation}")
-    logging.debug(
-        f"Filtered: {filtered_devices_in_organisation}")
-    (database.organisations
-        .update_one({"_id": ObjectId(organisation_id)},
-                    {"$set": {"devices": filtered_devices_in_organisation}}))
+        f"Deleting device from organisation {devices_in_organisation}"
+    )
+    logging.debug(f"Filtered: {filtered_devices_in_organisation}")
+    (
+        database.organisations.update_one(
+            {"_id": ObjectId(organisation_id)},
+            {"$set": {"devices": filtered_devices_in_organisation}},
+        )
+    )
     database.devices.delete_one({"_id": ObjectId(id)})
