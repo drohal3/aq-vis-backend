@@ -3,7 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from src.utils.config import DotEnvConfig
 from src.dependencies.authentication import get_current_active_user
-from src.models.user import User
+from src.models.user import UserOut
 
 TABLE = "cpc_measurements_test"
 
@@ -16,7 +16,7 @@ def read_items(
     date_time_from: str,
     date_time_to: str,
     device_id: int,
-    current_user: User = Depends(get_current_active_user),
+    current_user: UserOut = Depends(get_current_active_user),
 ):
     dynamodb = boto3.resource(
         "dynamodb",
@@ -41,5 +41,5 @@ def read_items(
 
 
 @router.get("/devices")
-def get_devices(current_user: User = Depends(get_current_active_user)):
+def get_devices(current_user: UserOut = Depends(get_current_active_user)):
     return [{"name": "cpc1", "id": 0}]

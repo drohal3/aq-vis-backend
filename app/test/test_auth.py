@@ -8,7 +8,7 @@ from src.database.operations.auth import (
     get_auth_user,
 )
 from test.data.user_json import new_user_json
-from src.models.user import NewUser
+from src.models.user import UserIn
 
 new_user_data = new_user_json[0]
 
@@ -18,7 +18,7 @@ def test_access_token():
         clean_database()
         database = get_database()
 
-        create_user(database=database, data=NewUser(**new_user_data))
+        create_user(database=database, data=UserIn(**new_user_data))
 
         user = get_auth_user(
             database=database,

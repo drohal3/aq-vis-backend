@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from src.dependencies.authentication import get_current_active_user
 from src.models.deviceindb import DeviceOut, DeviceIn
-from src.models.user import User
+from src.models.user import UserOut
 from src.database import get_database
 
 import logging
@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.post("", response_model=DeviceOut)
 async def create_device(
-    form_data: DeviceIn, current_user: User = Depends(get_current_active_user)
+    form_data: DeviceIn, current_user: UserOut = Depends(get_current_active_user)
 ):
     database = get_database()
     organisation_id = form_data.organisation
@@ -44,7 +44,7 @@ async def create_device(
 
 @router.get("", response_model=list[DeviceOut])
 async def get_devices(
-    organisation: str, current_user: User = Depends(get_current_active_user)
+    organisation: str, current_user: UserOut = Depends(get_current_active_user)
 ):
     database = get_database()
     organisation = database.organisations.find_one(
@@ -70,7 +70,7 @@ async def get_devices(
 
 @router.delete("/{id}")
 async def delete_device(
-    id: str, current_user: User = Depends(get_current_active_user)
+    id: str, current_user: UserOut = Depends(get_current_active_user)
 ):
     database = get_database()
     logging.debug(f"Deleting device {id}")
