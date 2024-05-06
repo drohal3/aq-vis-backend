@@ -80,6 +80,7 @@ async def get_organisations():
     organisations = database.organisations.find()
     ret = []
     for organisation in organisations:
+        logging.debug(f"=====> organisation: {organisation}")
         organisation["id"] = str(organisation["_id"])
         ret.append(Organisation(**organisation))
 

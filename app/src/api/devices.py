@@ -2,9 +2,10 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.dependencies.authentication import get_current_active_user
-from src.models.deviceindb import DeviceOut, DeviceIn
+from src.models.device import DeviceOut, DeviceIn
 from src.models.user import UserOut
 from src.database import get_database
+from src.database.operations import organisation_operations, device_operations
 
 import logging
 
@@ -26,20 +27,12 @@ async def create_device(
     if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
-    device_id = database.devices.insert_one(form_data.model_dump()).inserted_id
+    device = device_operations.create_device(database, form_data)
+    device_id = device["id"]
 
-    devices = organisation.get("devices", [])
-    devices.append(device_id)
+    organisation_operations.add_device(database, ObjectId(organisation_id), ObjectId(device_id))
 
-    database.organisations.update_one(
-        {"_id": ObjectId(organisation_id)}, {"$set": {"devices": devices}}
-    )
-    saved_device = database.devices.find_one({"_id": device_id})
-
-    saved_device["id"] = str(saved_device["_id"])
-    del saved_device["_id"]
-
-    return saved_device
+    return device
 
 
 @router.get("", response_model=list[DeviceOut])
@@ -55,7 +48,7 @@ async def get_devices(
     if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
-    devices = database.devices.find({"_id": {"$in": organisation["devices"]}})
+    devices = database.devices.find({"_id": {"$in": organisation["devices"]}})  # TODO: change to organisation
 
     ret = []
 
@@ -74,28 +67,13 @@ async def delete_device(
 ):
     database = get_database()
     logging.debug(f"Deleting device {id}")
-    device = database.devices.find_one({"_id": ObjectId(id)})
+    device = device_operations.find_device_by_id(database, ObjectId(id))
+
     if not device:
         raise HTTPException(status_code=404, detail="Device not found!")
-    organisation_id = str(device["organisation"])
+    organisation_id = device.organisation
     if not current_user.organisation == organisation_id:
         raise HTTPException(status_code=401, detail="Unauthorized!")
-    organisation = database.organisations.find_one(
-        {"_id": ObjectId(organisation_id)}
-    )
-    devices_in_organisation = organisation["devices"]
-    filtered_devices_in_organisation = []
-    for device in devices_in_organisation:
-        if str(device) != id:
-            filtered_devices_in_organisation.append(device)
-    logging.debug(
-        f"Deleting device from organisation {devices_in_organisation}"
-    )
-    logging.debug(f"Filtered: {filtered_devices_in_organisation}")
-    (
-        database.organisations.update_one(
-            {"_id": ObjectId(organisation_id)},
-            {"$set": {"devices": filtered_devices_in_organisation}},
-        )
-    )
-    database.devices.delete_one({"_id": ObjectId(id)})
+    organisation_operations.remove_device(database, ObjectId(organisation_id), ObjectId(id))
+
+    device_operations.delete_device(database, ObjectId(id))

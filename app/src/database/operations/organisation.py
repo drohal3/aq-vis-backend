@@ -65,3 +65,28 @@ def remove_membership(
     database.organisations.update_one(
         {"_id": organisation_id}, {"$set": {"members": members_new}}
     )
+
+def add_device(database: Database, organisation_id: ObjectId, device_id: ObjectId):
+    organisation = database.organisations.find_one({"_id": ObjectId(organisation_id)})
+
+    devices = organisation.get("devices", [])
+
+    if device_id not in devices:
+        devices.append(str(device_id))
+
+    database.organisations.update_one(
+        {"_id": ObjectId(organisation_id)}, {"$set": {"devices": devices}}
+    )
+
+def remove_device(database: Database, organisation_id: ObjectId, device_id: ObjectId):
+    organisation = database.organisations.find_one({"_id": ObjectId(organisation_id)})
+
+    devices = organisation.get("devices", [])
+    new_devices = []
+    for device in devices:
+        if not device == str(device_id):
+            new_devices.append(device)
+
+    database.organisations.update_one(
+        {"_id": ObjectId(organisation_id)}, {"$set": {"devices": new_devices}}
+    )

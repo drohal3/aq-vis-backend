@@ -53,7 +53,7 @@ def create_refresh_token():
 
 def get_user(db, username: str) -> UserInDB or None:
     logging.debug(f"get_user() - username: {username}")
-    user = db.users.find_one({"username": username})
+    user = db.users.find_one({"email": username})
     if user is None:
         return None
     logging.debug(f"get_user() - user: {user}")

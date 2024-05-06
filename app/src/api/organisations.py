@@ -24,3 +24,8 @@ async def get_organisation(
     organisation = find_organisation(database, ObjectId(organisation_id))
 
     return organisation
+
+@router.get("/{organisation_id}/members", response_model=list[UserOut])
+async def get_members():
+    # TODO:
+    return []
