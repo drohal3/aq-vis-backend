@@ -9,12 +9,18 @@ class Parameter(BaseModel):
     description: str | None = None
 
 
-class NewDevice(BaseModel):
+class DeviceBase(BaseModel):
     name: str
     code: str
     organisation: str
     parameters: list[Parameter] = []
 
 
-class Device(NewDevice):
+class DeviceIn(DeviceBase):
+    pass
+
+class DeviceOut(DeviceBase):
     id: str
+
+class DeviceInDB(DeviceOut):
+    pass
