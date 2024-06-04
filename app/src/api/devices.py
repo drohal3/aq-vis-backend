@@ -28,37 +28,33 @@ async def create_device(
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
     device = device_operations.create_device(database, form_data)
-    device_id = device["id"]
+    device_id = device.id
 
     organisation_operations.add_device(database, ObjectId(organisation_id), ObjectId(device_id))
 
     return device
 
+@router.put("/{device_id}", response_model=DeviceOut)
+async def update_device(device_id: str, form_data: DeviceIn, current_user: UserOut = Depends(get_current_active_user)):
+    database = get_database()
+    device = device_operations.update_device(database, ObjectId(device_id), form_data)
+    return device
 
 @router.get("", response_model=list[DeviceOut])
 async def get_devices(
-    organisation: str, current_user: UserOut = Depends(get_current_active_user)
+    organisation_id: str, current_user: UserOut = Depends(get_current_active_user)
 ):
     database = get_database()
-    organisation = database.organisations.find_one(
-        {"_id": ObjectId(organisation)}
-    )
+    organisation = organisation_operations.find_organisation(database, ObjectId(organisation_id))
     if not organisation:
         raise HTTPException(status_code=404, detail="Organisation not found!")
     if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
-    devices = database.devices.find({"_id": {"$in": organisation["devices"]}})  # TODO: change to organisation
+    # devices = database.devices.find({"_id": {"$in": organisation["devices"]}})  # TODO: change to organisation
+    devices = device_operations.find_devices_by_organisation(database, ObjectId(organisation_id))
 
-    ret = []
-
-    for device in devices:
-        device["id"] = str(device["_id"])
-        del device["_id"]
-        ret.append(device)
-        logging.debug(device)
-
-    return ret
+    return devices
 
 
 @router.delete("/{id}")
