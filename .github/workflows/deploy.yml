@@ -24,8 +24,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11.9'
-          architecture: 'arm64' # verify!
+          python-version: '3.11'
+          architecture: 'x64' # verify!
       - name: Install dependencies
         run: pip install -r ./requirements.txt
       - name: Install dev dependencies
