@@ -3,7 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from src.utils.config import DotEnvConfig
 from src.dependencies.authentication import get_current_active_user
-from src.models.user import User
+from src.models.user import UserOut
 
 TABLE = "cpc_measurements_test"
 
@@ -13,11 +13,13 @@ config = DotEnvConfig()
 
 @router.get("")
 def read_items(
-    date_time_from: str,
-    date_time_to: str,
-    device_id: int,
-    current_user: User = Depends(get_current_active_user),
+    time_from: str,
+    time_to: str,
+    device: str,
+    parameters: str,
+    current_user: UserOut = Depends(get_current_active_user),
 ):
+    # TODO: make parameters optional
     dynamodb = boto3.resource(
         "dynamodb",
         aws_access_key_id=config.get_config(config.ENV_AWS_ACCESS_KEY_ID),
@@ -27,19 +29,25 @@ def read_items(
         region_name=config.get_config(config.ENV_AWS_REGION_NAME),
     )
 
-    print(f">>>> >>>> date_time_from: {date_time_from}")
-
     table = dynamodb.Table(TABLE)
     # DATE_FROM = '2023-11-23 12:30:00'
     # DATE_TO = '2023-11-23 13:30:00'
     response = table.query(
-        KeyConditionExpression=Key("device_id").eq(device_id)
-        & Key("sample_date_time").between(date_time_from, date_time_to)
+        KeyConditionExpression=Key("device_id").eq(int(device))
+        & Key("sample_date_time").between(time_from, time_to),
     )
-    print(response)
-    return response["Items"]
+
+    filtered = []
+
+    for item in response["Items"]:
+        wanted_keys = parameters.split(",")
+        bigdict = item["sample_data"]
+        data = dict((k, bigdict[k]) for k in wanted_keys if k in bigdict)
+        data["sample_date_time"] = item["sample_date_time"]
+        filtered.append(data)
+    return filtered
 
 
 @router.get("/devices")
-def get_devices(current_user: User = Depends(get_current_active_user)):
+def get_devices(current_user: UserOut = Depends(get_current_active_user)):
     return [{"name": "cpc1", "id": 0}]

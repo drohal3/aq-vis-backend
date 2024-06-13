@@ -23,15 +23,15 @@ class UserBase(BaseModel):
     }
 
 
-class User(UserBase):
+class UserOut(UserBase):
     id: str
 
 
-class UnsecureUser(User):
+class UserInDB(UserOut):
     hashed_password: str
 
 
-class NewUser(UserBase):
+class UserIn(UserBase):
     password: str
     model_config = {
         "json_schema_extra": {

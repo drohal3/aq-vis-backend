@@ -4,7 +4,7 @@ from pymongo.database import Database
 from src.database.operations.auth import get_current_active_user
 from src.database import get_database
 
-from src.models.user import User
+from src.models.user import UserOut
 from fastapi.security import OAuth2PasswordBearer
 
 
@@ -13,7 +13,7 @@ router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@router.get("/me", response_model=User)
+@router.get("/me", response_model=UserOut)
 async def read_user_me(
     database: Database = Depends(get_database),
     token: str = Depends(oauth2_scheme),

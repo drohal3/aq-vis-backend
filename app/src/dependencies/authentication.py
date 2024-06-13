@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from src.utils import config, DotEnvConfig
 from src.database import get_database
 from src.models.auth import TokenData
-from src.models.user import UnsecureUser
+from src.models.user import UserInDB
 
 import logging
 
@@ -51,15 +51,15 @@ def create_refresh_token():
     pass
 
 
-def get_user(db, username: str) -> UnsecureUser or None:
+def get_user(db, username: str) -> UserInDB or None:
     logging.debug(f"get_user() - username: {username}")
-    user = db.users.find_one({"username": username})
+    user = db.users.find_one({"email": username})
     if user is None:
         return None
     logging.debug(f"get_user() - user: {user}")
 
     user["id"] = str(user["_id"])
-    return UnsecureUser(**user)
+    return UserInDB(**user)
 
 
 def authenticate_user(db, username: str, password: str):
@@ -105,7 +105,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 async def get_current_active_user(
-    current_user: UnsecureUser = Depends(get_current_user),
+    current_user: UserInDB = Depends(get_current_user),
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")

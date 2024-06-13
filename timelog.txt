@@ -28,5 +28,10 @@
                 TODO: use DI (Depends) for database
                 set up test DB, at least temporary, with MongoDB Atlas
 2024-04-22 7h   -
-2024-04-23 4h  TODO: place get_db to dependency
-               TODO: in test use dependency override https://fastapi.tiangolo.com/advanced/testing-database/
+2024-04-23 5.5h TODO: place get_db to dependency
+                TODO: in test use dependency override https://fastapi.tiangolo.com/advanced/testing-database/
+                completing tests for user and organisation, testing, refactoring
+2024-05-06 6h   devices API
+2024-05-07 5h   update device, tested with frontend, debugging
+2024-06-04
+           IDEA TODO: https://ron.sh/creating-real-time-charts-with-fastapi/

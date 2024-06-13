@@ -105,6 +105,11 @@ for router in routers.values():
     )
 
 
+@app.get("/")
+async def example():
+    return {"message": "Hello"}
+
+
 # Allow all origins in development, TODO: adjust accordingly for production
 app.add_middleware(
     CORSMiddleware,

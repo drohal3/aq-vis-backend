@@ -7,10 +7,10 @@ from src.dependencies.authentication import (
     get_password_hash,
 )
 
-from src.models.user import User, NewUser, UnsecureUser
+from src.models.user import UserOut, UserIn, UserInDB
 
 
-def find_user(database: Database, user_id: ObjectId) -> User | None:
+def find_user(database: Database, user_id: ObjectId) -> UserOut | None:
     user = database.users.find_one({"_id": user_id}, {"hashed_password": 0})
     if user is None:
         return user
@@ -21,7 +21,7 @@ def find_user(database: Database, user_id: ObjectId) -> User | None:
 
 def find_unsecure_user_by_email(
     database: Database, email: str
-) -> UnsecureUser | None:
+) -> UserInDB | None:
     user = database.users.find_one({"email": email})
     if user is None:
         return user
@@ -30,7 +30,7 @@ def find_unsecure_user_by_email(
     return user
 
 
-def create_user(database: Database, data: NewUser) -> User:
+def create_user(database: Database, data: UserIn) -> UserOut:
     password = data.password
     hashed_password = get_password_hash(password)
 
