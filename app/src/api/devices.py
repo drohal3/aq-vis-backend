@@ -14,7 +14,8 @@ router = APIRouter()
 
 @router.post("", response_model=DeviceOut)
 async def create_device(
-    form_data: DeviceIn, current_user: UserOut = Depends(get_current_active_user)
+    form_data: DeviceIn,
+    current_user: UserOut = Depends(get_current_active_user),
 ):
     database = get_database()
     organisation_id = form_data.organisation
@@ -30,29 +31,43 @@ async def create_device(
     device = device_operations.create_device(database, form_data)
     device_id = device.id
 
-    organisation_operations.add_device(database, ObjectId(organisation_id), ObjectId(device_id))
+    organisation_operations.add_device(
+        database, ObjectId(organisation_id), ObjectId(device_id)
+    )
 
     return device
+
 
 @router.put("/{device_id}", response_model=DeviceOut)
-async def update_device(device_id: str, form_data: DeviceIn, current_user: UserOut = Depends(get_current_active_user)):
+async def update_device(
+    device_id: str,
+    form_data: DeviceIn,
+    current_user: UserOut = Depends(get_current_active_user),
+):
     database = get_database()
-    device = device_operations.update_device(database, ObjectId(device_id), form_data)
+    device = device_operations.update_device(
+        database, ObjectId(device_id), form_data
+    )
     return device
+
 
 @router.get("", response_model=list[DeviceOut])
 async def get_devices(
-    organisation_id: str, current_user: UserOut = Depends(get_current_active_user)
+    organisation_id: str,
+    current_user: UserOut = Depends(get_current_active_user),
 ):
     database = get_database()
-    organisation = organisation_operations.find_organisation(database, ObjectId(organisation_id))
+    organisation = organisation_operations.find_organisation(
+        database, ObjectId(organisation_id)
+    )
     if not organisation:
         raise HTTPException(status_code=404, detail="Organisation not found!")
     if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
-    # devices = database.devices.find({"_id": {"$in": organisation["devices"]}})  # TODO: change to organisation
-    devices = device_operations.find_devices_by_organisation(database, ObjectId(organisation_id))
+    devices = device_operations.find_devices_by_organisation(
+        database, ObjectId(organisation_id)
+    )
 
     return devices
 
@@ -70,6 +85,8 @@ async def delete_device(
     organisation_id = device.organisation
     if not current_user.organisation == organisation_id:
         raise HTTPException(status_code=401, detail="Unauthorized!")
-    organisation_operations.remove_device(database, ObjectId(organisation_id), ObjectId(id))
+    organisation_operations.remove_device(
+        database, ObjectId(organisation_id), ObjectId(id)
+    )
 
     device_operations.delete_device(database, ObjectId(id))

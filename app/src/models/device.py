@@ -19,8 +19,10 @@ class DeviceBase(BaseModel):
 class DeviceIn(DeviceBase):
     pass
 
+
 class DeviceOut(DeviceBase):
     id: str
+
 
 class DeviceInDB(DeviceOut):
     pass

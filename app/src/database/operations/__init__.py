@@ -1,5 +1,8 @@
 from src.database.operations import user as user_operations
-from src.database.operations import organisation as organisation_operations, device as device_operations
+from src.database.operations import (
+    organisation as organisation_operations,
+    device as device_operations,
+)
 from pymongo.database import Database
 from src.models.organisation import (
     NewOrganisationMembership,
@@ -39,5 +42,5 @@ __all__ = [
     "add_user_to_organisation",
     "remove_user_from_organisation",
     "organisation_operations",
-    "device_operations"
+    "device_operations",
 ]
