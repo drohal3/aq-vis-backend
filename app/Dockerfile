@@ -14,4 +14,4 @@ EXPOSE 8000
 
 # No need for multi-stage build in python
 # TODO: host should be backend?
-CMD ["uvicorn", "src.main:app", "--reload", "--host=127.0.0.1"]
+CMD ["uvicorn", "src.main:app", "--reload", "--host=0.0.0.0"]
