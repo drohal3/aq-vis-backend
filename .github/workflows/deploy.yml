@@ -101,7 +101,7 @@ jobs:
           tags: drohal3/cpcvis-backend:latest
   notify:
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ publish-docker-hub ]
+    needs: [ publish-docker-hub, publish-ecr ]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
