@@ -35,3 +35,6 @@
 2024-05-07 5h   update device, tested with frontend, debugging
 2024-06-04
            IDEA TODO: https://ron.sh/creating-real-time-charts-with-fastapi/
+TAKE a look TODO: https://medium.com/aspiring-data-scientist/deploy-a-fastapi-app-on-aws-ecs-034b8b7b5ac2
+           TODO: deploy to ECR https://www.youtube.com/watch?v=t-9lWdZcrQM
+           TODO: https://www.youtube.com/watch?v=o22qYKDCGbU
