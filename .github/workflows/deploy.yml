@@ -80,6 +80,20 @@ jobs:
           docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+#      - name: Fill in the new image ID in the Amazon ECS task definition
+#        id: task-def
+#        uses: aws-actions/amazon-ecs-render-task-definition@v1
+#        with:
+#          task-definition: aqvis_api-task-definition.json
+#          container-name: aqvis_api
+#          image: ${{ steps.build-image.outputs.image }}
+#      - name: Deploy Amazon ECS task definition
+#        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#        with:
+#          task-definition: ${{ steps.task-def.outputs.task-definition }}
+#          service: nodejs-app-service
+#          cluster: DevCluster
+#          wait-for-service-stability: true
   publish-docker-hub:
     name: Publish image to Docker Hub
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
@@ -101,7 +115,7 @@ jobs:
           tags: drohal3/cpcvis-backend:latest
   notify:
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ publish-docker-hub ]
+    needs: [ publish-docker-hub, publish-ecr ]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
