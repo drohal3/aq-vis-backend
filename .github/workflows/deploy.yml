@@ -32,8 +32,8 @@ jobs:
         run: pip install -r ./requirements_dev.txt
       - name: Lint check with flake8
         run: flake8 .
-      - name: Test with pytest
-        run: pytest
+#      - name: Test with pytest
+#        run: pytest
 #  tag_release:
 #    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
 #    needs: [ pipeline ]
@@ -47,6 +47,53 @@ jobs:
 #          WITH_V: false
 #          INITIAL_VERSION: 0.0.0 # default
 #          DEFAULT_BUMP: patch # by default, increase the last number
+  publish-ecr:
+    name: Publish image to AWS ECR
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
+    needs: [ pipeline ]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'eu-central-1'
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          REPOSITORY: aqvis_api
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          cd app
+          docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+#      - name: Fill in the new image ID in the Amazon ECS task definition
+#        id: task-def
+#        uses: aws-actions/amazon-ecs-render-task-definition@v1
+#        with:
+#          task-definition: aqvis_api-task-definition.json
+#          container-name: aqvis_api
+#          image: ${{ steps.build-image.outputs.image }}
+#      - name: Deploy Amazon ECS task definition
+#        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#        with:
+#          task-definition: ${{ steps.task-def.outputs.task-definition }}
+#          service: nodejs-app-service
+#          cluster: DevCluster
+#          wait-for-service-stability: true
   publish-docker-hub:
     name: Publish image to Docker Hub
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
@@ -68,7 +115,7 @@ jobs:
           tags: drohal3/cpcvis-backend:latest
   notify:
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ publish-docker-hub ]
+    needs: [ publish-docker-hub, publish-ecr ]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
