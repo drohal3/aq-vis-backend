@@ -13,7 +13,6 @@ services:
        MONGODB_CONNECTION_URI: mongodb://root:example@mongo:27017/
 #       MONGODB_CONNECTION_URI_TEST: mongodb://root:example@mongo:27017/ # kept in separate file
        DB_NAME: the_database
-       DB_NAME_TEST: test_database
    mongo:
      image: mongo
      container_name: mongo

@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 
 
-# TODO: cleanup, refactor, move to appropriate folder
 class Database:
     database = None
     client = None
@@ -21,3 +20,4 @@ class Database:
     def clean_database(self):
         self.database.users.drop()
         self.database.organisations.drop()
+        self.database.devices.drop()

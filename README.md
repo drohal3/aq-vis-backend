@@ -20,8 +20,24 @@ To check linting, run while running backend in container:
 docker exec -it app-backend flake8 .
 ```
 
-## Environment Variables
-- `MONGODB_CONNECTION_URI`: Connection URL for mongo db
-- `DB_NAME`: Name of database
-- `DB_NAME_TEST`: Name of database used to run tests
+## ENV Variables
+> **WARNING:** The database used to run tests must be different from database used to run the app. Otherwise, all application data might ger corrupted or lost. 
+
+| variable                      | description                                  | note                     |
+|-------------------------------|----------------------------------------------|--------------------------|
+| **database**                  |                                              |                          |
+| `MONGODB_CONNECTION_URI`      | connection uri for the database              |                          |
+| `MONGODB_CONNECTION_URI_TEST` | connection uri for the database to run tests | \*used only to run tests |
+| `DB_NAME`                     | name of the database                         |                          |
+| `DB_NAME_TEST`                | name of the database used to run tests       | \*used only to run tests |
+| **encryption**                |                                              |                          |
+| `SECRET_KEY`                  |                                              |                          |
+| `ALGORITHM`                   |                                              |                          |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` |                                              |                          |
+| **AWS SDK**                   |                                              |                          |
+| `AWS_ACCESS_KEY_ID`           |                                              |                          |
+| `AWS_SECRET_ACCESS_KEY`       |                                              |                          |
+| `AWS_REGION_NAME`             |                                              |                          |
+|                               |                                              |                          |
+
 
