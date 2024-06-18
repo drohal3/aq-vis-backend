@@ -31,8 +31,7 @@ def test_me():
 
         assert response.status_code == 200
         response_json = response.json()
-
-        assert response_json["username"] == new_user_json[0]["username"]
+        assert response_json["email"] == new_user_json[0]["email"]
 
 
 def test_me_unauthorized():
@@ -44,14 +43,13 @@ def test_me_unauthorized():
 def test_create_user_api():
     with TestClient(app) as client:
         clean_database()
-        json = {
-            "disabled": False,
-            "email": "example@test.com",
-            "full_name": "Example User",
-            "password": "string",
-            "username": "string",
-        }
-
-        response = client.post("admin/users", json=json)
-
+        response = client.post("admin/users", json=new_user_json[0])
         assert response.status_code == 200
+
+
+def test_create_duplicate_user_api():
+    with TestClient(app) as client:
+        clean_database()
+        client.post("admin/users", json=new_user_json[0])
+        response = client.post("admin/users", json=new_user_json[0])
+        assert response.status_code == 401

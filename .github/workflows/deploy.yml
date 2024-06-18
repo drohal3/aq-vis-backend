@@ -32,8 +32,8 @@ jobs:
         run: pip install -r ./requirements_dev.txt
       - name: Lint check with flake8
         run: flake8 .
-#      - name: Test with pytest
-#        run: pytest
+      - name: Test with pytest
+        run: pytest
 #  tag_release:
 #    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
 #    needs: [ pipeline ]

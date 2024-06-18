@@ -31,6 +31,3 @@ def test_delete_user():
         user = find_user(database, ObjectId(new_user_id))
 
         assert user is None
-
-
-# TODO: def test_update_user():
