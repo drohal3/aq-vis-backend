@@ -6,12 +6,10 @@ The app is used as a backend for data visualisation app ass well as for the thir
 ## Prerequisites
 To run locally, listed commands require docker engine and docker-compose tool to be installed.
 
-The app can be run directly on the host machine. See commands in appropriate `Dockerfile` for more details for Linux OS.
+The app can be run directly on the host machine. See commands in appropriate `Dockerfile` for more details how to run the app with Linux OS.
 
 ## Instructions
->**Note:** Instructions for querying data for third-parties are in the separate website: https://idealaq.github.io/cpcvis-data-docs/
-
-> **Note:** The name of the container (app-backend) might not be the same. Verify using `docker container ls`.
+>**Note:** Instructions for querying data for third-parties are documented on the separate website: https://idealaq.github.io/cpcvis-data-docs/
 
 To run the backend locally, run 
 ```bash
