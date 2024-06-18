@@ -3,7 +3,10 @@ from fastapi import APIRouter, HTTPException
 
 from src.models.user import UserOut, UserIn
 from src.database import get_database
-from src.database.operations.user import create_user as create_user_operation, find_unsecure_user_by_email as find_unsecure_user_by_email_operation
+from src.database.operations.user import (
+    create_user as create_user_operation,
+    find_unsecure_user_by_email as find_unsecure_user_by_email_operation,
+)
 
 router = APIRouter()
 
@@ -16,7 +19,10 @@ async def create_user(form_data: UserIn):
     email = form_data.email
 
     if find_unsecure_user_by_email_operation(database, email):
-        raise HTTPException(status_code=401, detail="User with this email address already exists.")
+        raise HTTPException(
+            status_code=401,
+            detail="User with this email address already exists.",
+        )
 
     return create_user_operation(database, form_data)
 

@@ -27,6 +27,11 @@ To check linting, run while running backend in container:
 docker exec -it app-backend flake8 .
 ```
 
+To reformat files:
+```bash
+docker exec -it app-backend black .
+```
+
 ## ENV Variables
 > **WARNING:** The database used to run tests must be different from database used to run the app. Otherwise, all application data might ger corrupted or lost. 
 

@@ -46,6 +46,7 @@ def test_create_user_api():
         response = client.post("admin/users", json=new_user_json[0])
         assert response.status_code == 200
 
+
 def test_create_duplicate_user_api():
     with TestClient(app) as client:
         clean_database()

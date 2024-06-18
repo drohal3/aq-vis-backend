@@ -41,7 +41,7 @@ class UserIn(UserBase):
         ...,
         min_length=7,
         max_length=128,
-        description="Password must be between 7 and 128 characters long"
+        description="Password must be between 7 and 128 characters long",
     )
     model_config = {
         "json_schema_extra": {
