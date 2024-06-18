@@ -12,22 +12,37 @@ from src.models.user import UserOut, UserIn, UserInDB
 
 def find_user(database: Database, user_id: ObjectId) -> UserOut | None:
     user = database.users.find_one({"_id": user_id}, {"hashed_password": 0})
-    if user is None:
-        return user
+    if not user:
+        return None
     user["id"] = str(user["_id"])
 
-    return user
+    return UserOut(**user)
+
+
+def find_unsecure_user(
+    database: Database, user_id: ObjectId
+) -> UserInDB | None:
+    user = database.users.find_one({"_id": user_id})
+    if not user:
+        return None
+
+    user["id"] = str(user["_id"])
+    del user["_id"]
+
+    return UserInDB(**user)
 
 
 def find_unsecure_user_by_email(
     database: Database, email: str
 ) -> UserInDB | None:
     user = database.users.find_one({"email": email})
-    if user is None:
-        return user
-    user["id"] = str(user["_id"])
+    if not user:
+        return None
 
-    return user
+    user["id"] = str(user["_id"])
+    del user["_id"]
+
+    return UserInDB(**user)
 
 
 def create_user(database: Database, data: UserIn) -> UserOut:
@@ -48,6 +63,15 @@ def create_user(database: Database, data: UserIn) -> UserOut:
 
 def delete_user(database: Database, user_id: ObjectId):
     database.users.delete_one({"_id": user_id})
+
+
+def update_user(
+    database: Database, user_id: ObjectId, data: UserInDB
+) -> UserOut:
+    database.users.update_one(
+        {"_id": ObjectId(user_id)}, {"$set": data.model_dump()}
+    )
+    return find_user(database, user_id)
 
 
 def add_organisation(

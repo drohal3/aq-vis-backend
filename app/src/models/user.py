@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     #     description="Username must be between 5 and 15 characters long"
     # )
     email: EmailStr = Field(..., description="Email address")
-    full_name: str or None = None
+    full_name: str = Field(..., description="Full name of the user")
     disabled: bool = Field(default=True, description="Disabled user")
     organisation: str | None = Field(
         default=None, description="Organisation the user belongs to"

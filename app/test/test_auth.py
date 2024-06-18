@@ -32,6 +32,8 @@ def test_access_token():
             database=database, email=new_user_data["email"]
         )
 
-        current_user = get_current_user(database=database, token=access_token)
+        current_user = get_current_user(
+            database=database, token=access_token
+        ).model_dump()
 
         assert current_user["email"] == new_user_data["email"]

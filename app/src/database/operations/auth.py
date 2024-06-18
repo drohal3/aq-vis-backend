@@ -59,6 +59,8 @@ def get_auth_user(database, email: str, password: str):
     if not user:
         raise credentials_exception
 
+    user = user.model_dump()
+
     if not verify_password(password, user["hashed_password"]):
         raise credentials_exception
 
@@ -92,6 +94,6 @@ def get_current_active_user(
     database=Depends(get_database), token: str = Depends(oauth2_scheme)
 ):
     current_user = get_current_user(database, token)
-    if current_user["disabled"]:
+    if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
