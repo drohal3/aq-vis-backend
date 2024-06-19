@@ -4,8 +4,7 @@
 # https://www.youtube.com/watch?v=XnYYwcOfcn8&list=PLqAmigZvYxIL9dnYeZEhMoHcoP4zop8-p
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.utils import config, DotEnvConfig
@@ -19,7 +18,6 @@ from src.api import (
     units_router,
 )
 from src.api.admin.admin import admin_router
-from src.exceptions import ItemNotFoundException
 
 import logging
 
@@ -121,5 +119,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-

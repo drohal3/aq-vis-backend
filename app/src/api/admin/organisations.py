@@ -14,8 +14,10 @@ from src.database.operations.organisation import (
 from src.database.operations.user import (
     add_organisation as add_organisation_operation,
     remove_organisation as remove_organisation_operation,
+    find_user,
 )
 from src.database import get_database
+from src.exceptions import NotFoundException, DuplicateException
 import logging
 
 router = APIRouter()
@@ -61,17 +63,23 @@ async def delete_organisation(id: str):
 @router.get("/{organisation_id}", response_model=Organisation)
 async def get_organisation(organisation_id: str):
     database = get_database()
-    organisation = database.organisations.find_one({"_id": ObjectId(organisation_id)})
+    organisation = database.organisations.find_one(
+        {"_id": ObjectId(organisation_id)}
+    )
 
     logging.debug(organisation)
 
     if organisation is None:
-        raise HTTPException(status_code=404, detail=f"Organisation with id {organisation_id} not found!")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Organisation with id {organisation_id} not found!",
+        )
 
     # need to rename _id to id since _id is reserved in Python
     organisation["id"] = str(organisation["_id"])
 
     return organisation
+
 
 @router.get("/", response_model=list[Organisation])
 async def get_organisations():
@@ -96,9 +104,31 @@ async def add_user(form_data: NewOrganisationMembership):
     add_organisation_operation(
         database, ObjectId(user_id), ObjectId(organisation_id)
     )
-    add_membership_operation(
-        database, ObjectId(organisation_id), OrganisationMembership(**data)
-    )
+
+    user = find_user(database, ObjectId(user_id))
+
+    if not user:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {user_id} not found!"
+        )
+
+    try:
+        add_membership_operation(
+            database, ObjectId(organisation_id), OrganisationMembership(**data)
+        )
+    except NotFoundException:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Organisation with id {organisation_id} not found",
+        )
+    except DuplicateException:
+        raise HTTPException(
+            status_code=409,
+            detail=f"User with id {user_id} "
+            f"is already member of organisation with id {organisation_id}",
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Unexpected Error!")
 
 
 @router.post("/remove_user")

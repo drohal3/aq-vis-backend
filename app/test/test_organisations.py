@@ -4,13 +4,20 @@ from src.main import app
 from src.database import get_database, clean_database
 from bson import ObjectId
 
-from src.models.organisation import NewOrganisation
+from src.models.organisation import NewOrganisation, OrganisationMembership
 from src.database.operations.organisation import (
     create_organisation,
     find_organisation,
     delete_organisation,
+    add_membership,
 )
+from src.models.user import UserIn
 from test.data.organisation_json import new_organisation_json
+from test.data.user_json import new_user_json
+from src.database.operations.user import create_user
+from src.exceptions import DuplicateException, NotFoundException
+
+import pytest
 
 new_organisation_json_data = new_organisation_json[0]
 
@@ -42,3 +49,73 @@ def test_delete_organisation():
             database, ObjectId(new_organisation_id)
         )
         assert organisation is None
+
+
+def test_add_membership():
+    with TestClient(app):
+        clean_database()
+        database = get_database()
+        new_organisation = create_organisation(
+            database, NewOrganisation(**new_organisation_json_data)
+        )
+        new_organisation_id = new_organisation.id
+
+        new_user = create_user(database, UserIn(**new_user_json[0]))
+        new_user_id = new_user.id
+
+        add_membership(
+            database,
+            ObjectId(new_organisation_id),
+            OrganisationMembership(**{"user": new_user_id, "is_admin": False}),
+        )
+
+        organisation = find_organisation(
+            database, ObjectId(new_organisation_id)
+        ).model_dump()
+
+        assert organisation["members"][0]["user"] == new_user_id
+
+
+def test_add_duplicate_membership():
+    with TestClient(app):
+        clean_database()
+        database = get_database()
+        new_organisation = create_organisation(
+            database, NewOrganisation(**new_organisation_json_data)
+        )
+        new_organisation_id = new_organisation.id
+
+        new_user = create_user(database, UserIn(**new_user_json[0]))
+        new_user_id = new_user.id
+
+        add_membership(
+            database,
+            ObjectId(new_organisation_id),
+            OrganisationMembership(**{"user": new_user_id, "is_admin": False}),
+        )
+
+        with pytest.raises(DuplicateException):
+            add_membership(
+                database,
+                ObjectId(new_organisation_id),
+                OrganisationMembership(
+                    **{"user": new_user_id, "is_admin": False}
+                ),
+            )
+
+
+def test_add_membership_organisation_not_exist():
+    with TestClient(app):
+        clean_database()
+        database = get_database()
+        new_user = create_user(database, UserIn(**new_user_json[0]))
+        new_user_id = new_user.id
+
+        with pytest.raises(NotFoundException):
+            add_membership(
+                database,
+                ObjectId("000000000000000000000000"),
+                OrganisationMembership(
+                    **{"user": new_user_id, "is_admin": False}
+                ),
+            )
