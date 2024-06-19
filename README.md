@@ -55,3 +55,8 @@ To generate `SECRET_KEY`, run
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+
+## Limitations
+> The communication with the database is implemented with pymongo which causes blocking operations. To benefit from asynchronous FastAPI, transition to i.e. motor is needed.
+> ***
+> However, motor is built on top of pymongo and syntax is mostly compatible making the transition smooth.

@@ -1,5 +1,6 @@
 from pymongo.database import Database
 from bson import ObjectId
+from fastapi import HTTPException
 
 from src.models.organisation import (
     Organisation,
@@ -44,7 +45,7 @@ def add_membership(
 ):
     membership_data = membership.model_dump()
     organisation = find_organisation(database, organisation_id)
-    # TODO: exception organisation does not exist
+
     organisation = organisation.model_dump()
     members = organisation["members"]
 

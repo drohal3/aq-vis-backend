@@ -58,21 +58,20 @@ async def delete_organisation(id: str):
     # TODO: delete organisation's devices
 
 
-@router.get("/{id}", response_model=Organisation)
-async def get_organisation(id: str):
+@router.get("/{organisation_id}", response_model=Organisation)
+async def get_organisation(organisation_id: str):
     database = get_database()
-    organisation = database.organisations.find_one({"_id": ObjectId(id)})
+    organisation = database.organisations.find_one({"_id": ObjectId(organisation_id)})
 
     logging.debug(organisation)
 
     if organisation is None:
-        raise HTTPException(status_code=404, detail="Not Found!")
+        raise HTTPException(status_code=404, detail=f"Organisation with id {organisation_id} not found!")
 
     # need to rename _id to id since _id is reserved in Python
     organisation["id"] = str(organisation["_id"])
 
     return organisation
-
 
 @router.get("/", response_model=list[Organisation])
 async def get_organisations():
