@@ -22,11 +22,11 @@ def test_create_organisation():
         new_organisation = create_organisation(
             database, NewOrganisation(**new_organisation_json_data)
         )
-        new_organisation_id = new_organisation["id"]
+        new_organisation_id = new_organisation.id
         organisation = find_organisation(
             database, ObjectId(new_organisation_id)
         )
-        assert new_organisation_id == organisation["id"]
+        assert new_organisation_id == organisation.id
 
 
 def test_delete_organisation():
@@ -36,7 +36,7 @@ def test_delete_organisation():
         new_organisation = create_organisation(
             database, NewOrganisation(**new_organisation_json_data)
         )
-        new_organisation_id = new_organisation["id"]
+        new_organisation_id = new_organisation.id
         delete_organisation(database, ObjectId(new_organisation_id))
         organisation = find_organisation(
             database, ObjectId(new_organisation_id)

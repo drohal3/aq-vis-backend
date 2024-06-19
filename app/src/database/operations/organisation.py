@@ -22,7 +22,7 @@ def find_organisation(
         devices.append(str(device))
     organisation["devices"] = devices
 
-    return organisation
+    return Organisation(**organisation)
 
 
 def create_organisation(
@@ -44,10 +44,13 @@ def add_membership(
 ):
     membership_data = membership.model_dump()
     organisation = find_organisation(database, organisation_id)
+    # TODO: exception organisation does not exist
+    organisation = organisation.model_dump()
     members = organisation["members"]
+
     members.append(membership_data)
 
-    # TODO: if user already a member?
+    # TODO: exception user already a member
     database.organisations.update_one(
         {"_id": ObjectId(organisation_id)}, {"$set": {"members": members}}
     )
@@ -57,6 +60,8 @@ def remove_membership(
     database: Database, organisation_id: ObjectId, user_id: ObjectId
 ):
     organisation = find_organisation(database, organisation_id)
+    # TODO: exception organisation does not exist
+    organisation = organisation.model_dump()
     members = organisation["members"]
     members_new = []
     for member in members:
