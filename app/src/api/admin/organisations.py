@@ -6,18 +6,12 @@ from src.models.organisation import (
     NewOrganisationMembership,
     OrganisationMembership,
 )
-
 from src.database.operations import (
     organisation_operations,
     user_operations,
     remove_user_from_organisation_operation,
+    device_operations,
 )
-
-# from src.database.operations.user import (
-#     add_organisation as add_organisation_operation,
-#     remove_organisation as remove_organisation_operation,
-#     find_user,
-# )
 from src.database import get_database
 from src.exceptions import NotFoundException, DuplicateException
 import logging
@@ -56,12 +50,22 @@ async def update_organisation(form_data: Organisation):
     return updated_organisation
 
 
-@router.delete("/{id}", status_code=204)
-async def delete_organisation(id: str):
+@router.delete("/{organisation_id}", status_code=204)
+async def delete_organisation(organisation_id: str):
     database = get_database()
-    # TODO: authenticate
-    database.organisations.delete_one({"_id": ObjectId(id)})
-    # TODO: delete organisation's devices
+    organisation = organisation_operations.find_organisation(
+        database, ObjectId(organisation_id)
+    )
+    if not organisation:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Organisation {organisation_id} not found!",
+        )
+    for device in organisation.devices:
+        device_operations.delete_device(database, ObjectId(device))
+    organisation_operations.delete_organisation(
+        database, ObjectId(organisation_id)
+    )
 
 
 @router.get("/{organisation_id}", response_model=Organisation)

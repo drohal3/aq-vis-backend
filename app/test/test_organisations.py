@@ -146,6 +146,7 @@ def test_remove_membership():
         )  # only second id present
         assert len(organisation.members) == 1
 
+
 def test_remove_membership_not_exist():
     with TestClient(app):
         clean_database()
@@ -153,7 +154,5 @@ def test_remove_membership_not_exist():
         some_id = "000000000000000000000000"
         with pytest.raises(NotFoundException):
             organisation_operations.remove_membership(
-                database,
-                ObjectId(some_id),
-                ObjectId(some_id)
+                database, ObjectId(some_id), ObjectId(some_id)
             )

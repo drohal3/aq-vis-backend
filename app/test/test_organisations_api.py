@@ -51,6 +51,18 @@ def test_delete_organisation():
         response = client.delete(f"/admin/organisations/{organisation_id}")
         assert response.status_code == 204
 
+        response = client.get(f"/admin/organisations/{organisation_id}")
+
+        assert response.status_code == 404
+
+
+def test_delete_organisation_not_exist():
+    with TestClient(app) as client:
+        clean_database()
+        some_id = "000000000000000000000000"
+        response = client.delete(f"/admin/organisations/{some_id}")
+        assert response.status_code == 404
+
 
 def test_add_and_remove_member():
     with TestClient(app) as client:
