@@ -39,3 +39,4 @@ TAKE a look TODO: https://medium.com/aspiring-data-scientist/deploy-a-fastapi-ap
            TODO: deploy to ECR https://www.youtube.com/watch?v=t-9lWdZcrQM
            TODO: https://www.youtube.com/watch?v=o22qYKDCGbU
 2024-06-1x 14h  ECS, ECR, VPC setup and debugging (issue with VPC in AWS and failing deploys)
+       -20 21h  refactoring, adding tests, debugging
