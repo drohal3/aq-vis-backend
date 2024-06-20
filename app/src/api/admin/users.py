@@ -3,13 +3,7 @@ from fastapi import APIRouter, HTTPException
 
 from src.models.user import UserOut, UserIn, UserBase
 from src.database import get_database
-from src.database.operations.user import (
-    create_user as create_user_operation,
-    find_user as find_user_operation,
-    find_unsecure_user_by_email as find_unsecure_user_by_email_operation,
-    find_unsecure_user as find_unsecure_user_operation,
-    update_user as update_user_operation,
-)
+from src.database.operations import user_operations
 
 # TODO: =====> =====> =====> Authentication! <===== <===== <=====
 
@@ -23,20 +17,20 @@ async def create_user(form_data: UserIn):
 
     email = form_data.email
 
-    if find_unsecure_user_by_email_operation(database, email):
+    if user_operations.find_unsecure_user_by_email(database, email):
         raise HTTPException(
-            status_code=401,
+            status_code=409,
             detail="User with this email address already exists.",
         )
 
-    return create_user_operation(database, form_data)
+    return user_operations.create_user(database, form_data)
 
 
 @router.put("/{user_id}", response_model=UserOut)
 async def update_user(user_id: str, form_data: UserBase):
     database = get_database()
 
-    user_to_update = find_unsecure_user_operation(database, ObjectId(user_id))
+    user_to_update = user_operations.find_unsecure_user(database, ObjectId(user_id))
 
     if user_to_update is None:
         raise HTTPException(
@@ -48,9 +42,9 @@ async def update_user(user_id: str, form_data: UserBase):
         update=form_data.dict(exclude_unset=True)
     )
 
-    update_user_operation(database, ObjectId(user_id), updated_user_data)
+    user_operations.update_user(database, ObjectId(user_id), updated_user_data)
 
-    return find_user_operation(database, ObjectId(user_id))
+    return user_operations.find_user(database, ObjectId(user_id))
 
 
 @router.delete("/{id}")
