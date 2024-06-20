@@ -18,6 +18,28 @@ def test_create_organisation():
         assert response.status_code == 201
 
 
+def test_get_organisation():
+    with TestClient(app) as client:
+        clean_database()
+        new_organisation = client.post(
+            "/admin/organisations", json=new_organisation_data
+        )
+
+        new_organisation_id = new_organisation.json()["id"]
+
+        response = client.get(f"/admin/organisations/{new_organisation_id}")
+        assert response.status_code == 200
+        assert response.json()["id"] == new_organisation_id
+
+
+def test_get_organisation_not_exist():
+    with TestClient(app) as client:
+        clean_database()
+        new_organisation_id = "000000000000000000000000"
+        response = client.get(f"/admin/organisations/{new_organisation_id}")
+        assert response.status_code == 404
+
+
 def test_delete_organisation():
     with TestClient(app) as client:
         clean_database()
@@ -28,6 +50,18 @@ def test_delete_organisation():
 
         response = client.delete(f"/admin/organisations/{organisation_id}")
         assert response.status_code == 204
+
+        response = client.get(f"/admin/organisations/{organisation_id}")
+
+        assert response.status_code == 404
+
+
+def test_delete_organisation_not_exist():
+    with TestClient(app) as client:
+        clean_database()
+        some_id = "000000000000000000000000"
+        response = client.delete(f"/admin/organisations/{some_id}")
+        assert response.status_code == 404
 
 
 def test_add_and_remove_member():
@@ -50,3 +84,25 @@ def test_add_and_remove_member():
             "/admin/organisations/remove_user", json=member_json
         )
         assert response.status_code == 200
+
+
+def test_add_member_already_exist():
+    with TestClient(app) as client:
+        clean_database()
+
+        organisation_response = client.post(
+            "/admin/organisations", json=new_organisation_data
+        )
+        organisation_id = organisation_response.json()["id"]
+
+        user_response = client.post("admin/users", json=new_user_data)
+        user_id = user_response.json()["id"]
+
+        member_json = {"organisation": organisation_id, "user": user_id}
+
+        client.post("/admin/organisations/add_user", json=member_json)
+        response = client.post(
+            "/admin/organisations/add_user", json=member_json
+        )
+
+        assert response.status_code == 409

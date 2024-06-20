@@ -1,48 +1,67 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 
-from src.models.user import UserOut, UserIn
+from src.models.user import UserOut, UserIn, UserBase
 from src.database import get_database
-from src.database.operations.user import (
-    create_user as create_user_operation,
-    find_unsecure_user_by_email as find_unsecure_user_by_email_operation,
-)
+from src.database.operations import user_operations
+
+# TODO: =====> =====> =====> Authentication! <===== <===== <=====
 
 router = APIRouter()
 
 
-@router.post("/", response_model=UserOut)
+@router.get("/{user_id}", response_model=UserOut)
+async def get_user(user_id: str):
+    database = get_database()
+    user = user_operations.find_user(database, ObjectId(user_id))
+
+    if not user:
+        raise HTTPException(
+            status_code=404, detail=f"User {user_id} not found!"
+        )
+
+    return user
+
+
+@router.post("/", response_model=UserOut, status_code=201)
 async def create_user(form_data: UserIn):
-    # TODO: database to DI (Depends)
     database = get_database()
 
     email = form_data.email
 
-    if find_unsecure_user_by_email_operation(database, email):
+    if user_operations.find_unsecure_user_by_email(database, email):
         raise HTTPException(
-            status_code=401,
+            status_code=409,
             detail="User with this email address already exists.",
         )
 
-    return create_user_operation(database, form_data)
+    return user_operations.create_user(database, form_data)
 
 
-@router.put("/", response_model=UserOut)
-async def update_user(form_data: UserOut):
+@router.put("/{user_id}", response_model=UserOut)
+async def update_user(user_id: str, form_data: UserBase):
     database = get_database()
-    data = form_data.model_dump()
-    user_id = data["id"]
 
-    del data["id"]
+    user_to_update = user_operations.find_unsecure_user(
+        database, ObjectId(user_id)
+    )
 
-    database.users.update_one({"_id": ObjectId(user_id)}, {"$set": data})
-    updated_user = database.users.find_one({"_id": ObjectId(user_id)})
-    updated_user["id"] = str(updated_user["_id"])
+    if user_to_update is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
 
-    return updated_user
+    updated_user_data = user_to_update.copy(
+        update=form_data.dict(exclude_unset=True)
+    )
+
+    user_operations.update_user(database, ObjectId(user_id), updated_user_data)
+
+    return user_operations.find_user(database, ObjectId(user_id))
 
 
-@router.delete("/{id}")
-async def delete_user():
-    # database = get_database()
-    pass
+@router.delete("/{user_id}", status_code=204)
+async def delete_user(user_id: str):
+    database = get_database()
+    user_operations.delete_user(database, ObjectId(user_id))

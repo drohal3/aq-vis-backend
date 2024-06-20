@@ -97,6 +97,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 for router in routers.values():
     app.include_router(
         router.get("router"),

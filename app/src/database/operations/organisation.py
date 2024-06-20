@@ -1,5 +1,6 @@
 from pymongo.database import Database
 from bson import ObjectId
+from src.exceptions import NotFoundException, DuplicateException
 
 from src.models.organisation import (
     Organisation,
@@ -22,7 +23,7 @@ def find_organisation(
         devices.append(str(device))
     organisation["devices"] = devices
 
-    return organisation
+    return Organisation(**organisation)
 
 
 def create_organisation(
@@ -44,10 +45,18 @@ def add_membership(
 ):
     membership_data = membership.model_dump()
     organisation = find_organisation(database, organisation_id)
-    members = organisation["members"]
-    members.append(membership_data)
 
-    # TODO: if user already a member?
+    if not organisation:
+        raise NotFoundException
+
+    organisation = organisation.model_dump()
+    members = organisation["members"]
+
+    for member in members:
+        if member["user"] == membership_data["user"]:
+            raise DuplicateException()
+
+    members.append(membership_data)
     database.organisations.update_one(
         {"_id": ObjectId(organisation_id)}, {"$set": {"members": members}}
     )
@@ -57,6 +66,9 @@ def remove_membership(
     database: Database, organisation_id: ObjectId, user_id: ObjectId
 ):
     organisation = find_organisation(database, organisation_id)
+    if not organisation:
+        raise NotFoundException(f"Organisation {organisation_id} not found")
+    organisation = organisation.model_dump()
     members = organisation["members"]
     members_new = []
     for member in members:

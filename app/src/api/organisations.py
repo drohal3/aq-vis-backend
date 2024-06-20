@@ -23,6 +23,11 @@ async def get_organisation(
 
     organisation = find_organisation(database, ObjectId(organisation_id))
 
+    if not organisation:
+        raise HTTPException(
+            404, detail=f"Organisation with id {organisation_id} not found!"
+        )
+
     return organisation
 
 
