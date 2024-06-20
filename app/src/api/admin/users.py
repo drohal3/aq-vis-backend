@@ -10,9 +10,21 @@ from src.database.operations import user_operations
 router = APIRouter()
 
 
-@router.post("/", response_model=UserOut)
+@router.get("/{user_id}", response_model=UserOut)
+async def get_user(user_id: str):
+    database = get_database()
+    user = user_operations.find_user(database, ObjectId(user_id))
+
+    if not user:
+        raise HTTPException(
+            status_code=404, detail=f"User {user_id} not found!"
+        )
+
+    return user
+
+
+@router.post("/", response_model=UserOut, status_code=201)
 async def create_user(form_data: UserIn):
-    # TODO: database to DI (Depends)
     database = get_database()
 
     email = form_data.email
@@ -30,7 +42,9 @@ async def create_user(form_data: UserIn):
 async def update_user(user_id: str, form_data: UserBase):
     database = get_database()
 
-    user_to_update = user_operations.find_unsecure_user(database, ObjectId(user_id))
+    user_to_update = user_operations.find_unsecure_user(
+        database, ObjectId(user_id)
+    )
 
     if user_to_update is None:
         raise HTTPException(
@@ -47,7 +61,7 @@ async def update_user(user_id: str, form_data: UserBase):
     return user_operations.find_user(database, ObjectId(user_id))
 
 
-@router.delete("/{id}")
-async def delete_user():
-    # database = get_database()
-    pass
+@router.delete("/{user_id}", status_code=204)
+async def delete_user(user_id: str):
+    database = get_database()
+    user_operations.delete_user(database, ObjectId(user_id))
