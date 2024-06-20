@@ -3,6 +3,7 @@ from src.main import app
 from src.database import clean_database
 from test.data.user_json import new_user_json
 
+
 def test_create_user_get_user_api():
     with TestClient(app) as client:
         clean_database()
