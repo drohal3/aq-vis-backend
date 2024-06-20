@@ -6,6 +6,7 @@ import logging
 from src.dependencies.authentication import (
     get_password_hash,
 )
+from src.exceptions import NotFoundException
 
 from src.models.user import UserOut, UserIn, UserInDB
 
@@ -85,6 +86,9 @@ def add_organisation(
 def remove_organisation(
     database: Database, user_id: ObjectId, organisation_id: ObjectId
 ):
+    user = find_user(database, user_id)
+    if not user:
+        raise NotFoundException(f"User {user_id} not found!")
     database.users.update_one(
         {"_id": user_id}, {"$set": {"organisation": None}}
     )

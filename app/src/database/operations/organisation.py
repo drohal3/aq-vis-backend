@@ -66,7 +66,8 @@ def remove_membership(
     database: Database, organisation_id: ObjectId, user_id: ObjectId
 ):
     organisation = find_organisation(database, organisation_id)
-    # TODO: exception organisation does not exist
+    if not organisation:
+        raise NotFoundException(f"Organisation {organisation_id} not found")
     organisation = organisation.model_dump()
     members = organisation["members"]
     members_new = []

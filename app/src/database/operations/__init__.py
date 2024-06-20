@@ -15,6 +15,7 @@ from bson import ObjectId
 def add_user_to_organisation(
     database: Database, membership: NewOrganisationMembership
 ):
+    # TODO: use it!
     user_id = membership.user
     organisation_id = membership.organisation
     new_membership_data = membership.model_dump()
@@ -29,10 +30,13 @@ def add_user_to_organisation(
     )
 
 
-def remove_user_from_organisation(
-    database: Database, membership: NewOrganisationMembership
+def remove_user_from_organisation_operation(
+    database: Database, user_id: ObjectId, organisation_id: ObjectId
 ):
-    pass
+    user_operations.remove_organisation(database, user_id, organisation_id)
+    organisation_operations.remove_membership(
+        database, organisation_id, user_id
+    )
 
 
 # END organisation - user
@@ -40,7 +44,8 @@ def remove_user_from_organisation(
 
 __all__ = [
     "add_user_to_organisation",
-    "remove_user_from_organisation",
+    "remove_user_from_organisation_operation",
     "organisation_operations",
     "device_operations",
+    "user_operations",
 ]

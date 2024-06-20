@@ -6,16 +6,18 @@ from src.models.organisation import (
     NewOrganisationMembership,
     OrganisationMembership,
 )
-from src.database.operations.organisation import (
-    create_organisation as create_organisation_operation,
-    add_membership as add_membership_operation,
-    remove_membership as remove_membership_operation,
+
+from src.database.operations import (
+    organisation_operations,
+    user_operations,
+    remove_user_from_organisation_operation,
 )
-from src.database.operations.user import (
-    add_organisation as add_organisation_operation,
-    remove_organisation as remove_organisation_operation,
-    find_user,
-)
+
+# from src.database.operations.user import (
+#     add_organisation as add_organisation_operation,
+#     remove_organisation as remove_organisation_operation,
+#     find_user,
+# )
 from src.database import get_database
 from src.exceptions import NotFoundException, DuplicateException
 import logging
@@ -26,7 +28,9 @@ router = APIRouter()
 @router.post("/", response_model=Organisation, status_code=201)
 async def create_organisation(form_data: NewOrganisation):
     database = get_database()
-    created_organisation = create_organisation_operation(database, form_data)
+    created_organisation = organisation_operations.create_organisation(
+        database, form_data
+    )
 
     # need to rename _id to id since _id is reserved in Python
     logging.debug(f"Created organisation: {created_organisation}")
@@ -101,11 +105,11 @@ async def add_user(form_data: NewOrganisationMembership):
     data = form_data.model_dump()
     user_id = data["user"]
     organisation_id = data["organisation"]
-    add_organisation_operation(
+    user_operations.add_organisation(
         database, ObjectId(user_id), ObjectId(organisation_id)
     )
 
-    user = find_user(database, ObjectId(user_id))
+    user = user_operations.find_user(database, ObjectId(user_id))
 
     if not user:
         raise HTTPException(
@@ -113,7 +117,8 @@ async def add_user(form_data: NewOrganisationMembership):
         )
 
     try:
-        add_membership_operation(
+        # TODO: add operation from operations __init__
+        organisation_operations.add_membership(
             database, ObjectId(organisation_id), OrganisationMembership(**data)
         )
     except NotFoundException:
@@ -137,9 +142,9 @@ async def remove_user(form_data: NewOrganisationMembership):
     data = form_data.model_dump()
     user_id = data["user"]
     organisation_id = data["organisation"]
-    remove_organisation_operation(
-        database, ObjectId(user_id), ObjectId(organisation_id)
-    )
-    remove_membership_operation(
-        database, ObjectId(organisation_id), ObjectId(user_id)
-    )
+    try:
+        remove_user_from_organisation_operation(
+            database, ObjectId(user_id), ObjectId(organisation_id)
+        )
+    except NotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
