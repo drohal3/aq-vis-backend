@@ -23,7 +23,7 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def _create_access_token(
+def create_access_token(
     data: dict, expires_delta: timedelta or None = None
 ) -> str:
     to_encode = data.copy()
@@ -44,7 +44,7 @@ def create_login_access_token(
     # TODO: token can be stored in database so it can be invalidated
     data = {"sub": email}
 
-    return _create_access_token(data, expires_delta)
+    return create_access_token(data, expires_delta)
 
 
 def get_auth_user(database, email: str, password: str):

@@ -4,18 +4,17 @@ from fastapi import APIRouter, Depends
 from src.models.auth import Token
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from src.utils.config import DotEnvConfig
 from src.database import get_database
 from src.database.operations.auth import (
     get_auth_user,
     create_login_access_token,
 )
+from src.utils import config
 
 router = APIRouter()
-config = DotEnvConfig()
 
 
-@router.post("/token", response_model=Token)
+@router.post("/token", response_model=Token, status_code=201)
 async def login_for_token(
     database=Depends(get_database),
     form_data: OAuth2PasswordRequestForm = Depends(),
