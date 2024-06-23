@@ -17,7 +17,7 @@ def test_admin_login_api():
         assert type(response.json()["access_token"]) == str
 
 
-def test_admin_login_incorrect_api():
+def test_admin_login_api_incorrect_credentials():
     with TestClient(app) as client:
         username = config.get_config(config.ENV_ADMIN_EMAIL)
         password = config.get_config(config.ENV_ADMIN_PASSWORD)

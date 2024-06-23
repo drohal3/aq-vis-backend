@@ -1,5 +1,6 @@
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from src.database.operations.auth import get_current_admin
 
 from src.models.user import UserOut, UserIn, UserBase
 from src.database import get_database
@@ -11,7 +12,9 @@ router = APIRouter()
 
 
 @router.get("/{user_id}", response_model=UserOut)
-async def get_user(user_id: str):
+async def get_user(
+    user_id: str, current_admin: str = Depends(get_current_admin)
+):
     database = get_database()
     user = user_operations.find_user(database, ObjectId(user_id))
 
@@ -24,7 +27,9 @@ async def get_user(user_id: str):
 
 
 @router.post("/", response_model=UserOut, status_code=201)
-async def create_user(form_data: UserIn):
+async def create_user(
+    form_data: UserIn, current_admin: str = Depends(get_current_admin)
+):
     database = get_database()
 
     email = form_data.email
@@ -39,7 +44,11 @@ async def create_user(form_data: UserIn):
 
 
 @router.put("/{user_id}", response_model=UserOut)
-async def update_user(user_id: str, form_data: UserBase):
+async def update_user(
+    user_id: str,
+    form_data: UserBase,
+    current_admin: str = Depends(get_current_admin),
+):
     database = get_database()
 
     user_to_update = user_operations.find_unsecure_user(
@@ -62,6 +71,8 @@ async def update_user(user_id: str, form_data: UserBase):
 
 
 @router.delete("/{user_id}", status_code=204)
-async def delete_user(user_id: str):
+async def delete_user(
+    user_id: str, current_admin: str = Depends(get_current_admin)
+):
     database = get_database()
     user_operations.delete_user(database, ObjectId(user_id))

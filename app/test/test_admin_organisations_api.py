@@ -10,7 +10,7 @@ new_organisation_data = new_organisation_json[0]
 new_user_data = new_user_json[0]
 
 
-def test_create_organisation():
+def test_create_organisation_api():
     with TestClient(app) as client:
         clean_database()
         response = client.post(
@@ -21,7 +21,7 @@ def test_create_organisation():
         assert response.status_code == 201
 
 
-def test_create_organisation_unauthorized():
+def test_create_organisation_api_unauthorized():
     with TestClient(app) as client:
         clean_database()
         response = client.post(
@@ -30,7 +30,7 @@ def test_create_organisation_unauthorized():
         assert response.status_code == 401
 
 
-def test_get_organisation():
+def test_get_organisation_api():
     with TestClient(app) as client:
         clean_database()
         new_organisation = client.post(
@@ -49,7 +49,7 @@ def test_get_organisation():
         assert response.json()["id"] == new_organisation_id
 
 
-def test_get_organisation_unauthorized():
+def test_get_organisation_api_unauthorized():
     with TestClient(app) as client:
         clean_database()
         new_organisation_id = "000000000000000000000000"
@@ -60,7 +60,7 @@ def test_get_organisation_unauthorized():
         assert response.status_code == 401
 
 
-def test_get_organisation_not_exist():
+def test_get_organisation_api_not_exist():
     with TestClient(app) as client:
         clean_database()
         new_organisation_id = "000000000000000000000000"
@@ -71,7 +71,7 @@ def test_get_organisation_not_exist():
         assert response.status_code == 404
 
 
-def test_delete_organisation():
+def test_delete_organisation_api():
     with TestClient(app) as client:
         clean_database()
         response = client.post(
@@ -95,7 +95,7 @@ def test_delete_organisation():
         assert response.status_code == 404
 
 
-def test_delete_organisation_unauthorized():
+def test_delete_organisation_api_unauthorized():
     with TestClient(app) as client:
         clean_database()
 
@@ -107,7 +107,7 @@ def test_delete_organisation_unauthorized():
         assert response.status_code == 401
 
 
-def test_delete_organisation_not_exist():
+def test_delete_organisation_api_not_exist():
     with TestClient(app) as client:
         clean_database()
         some_id = "000000000000000000000000"
@@ -117,7 +117,7 @@ def test_delete_organisation_not_exist():
         assert response.status_code == 404
 
 
-def test_add_and_remove_member():
+def test_add_and_remove_member_api():
     with TestClient(app) as client:
         clean_database()
         organisation_response = client.post(
@@ -147,7 +147,7 @@ def test_add_and_remove_member():
         assert response.status_code == 200
 
 
-def test_add_and_remove_member_unauthorized():
+def test_add_and_remove_member_api_unauthorized():
     with TestClient(app) as client:
         clean_database()
 
@@ -168,7 +168,7 @@ def test_add_and_remove_member_unauthorized():
         assert response.status_code == 401
 
 
-def test_add_member_already_exist():
+def test_add_member_api_already_exist():
     with TestClient(app) as client:
         clean_database()
 
