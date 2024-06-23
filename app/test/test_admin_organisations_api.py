@@ -4,28 +4,10 @@ from src.database import clean_database
 
 from test.data.organisation_json import new_organisation_json
 from test.data.user_json import new_user_json
-from src.utils.config import DotEnvConfig
-
-config = DotEnvConfig()
+from test.functions import get_admin_header
 
 new_organisation_data = new_organisation_json[0]
 new_user_data = new_user_json[0]
-
-
-def get_admin_header(client):
-    username = config.get_config(config.ENV_ADMIN_EMAIL)
-    password = config.get_config(config.ENV_ADMIN_PASSWORD)
-    token_response = client.post(
-        "/admin/token",
-        data={
-            "username": username,
-            "password": password,
-        },
-    )
-    token = token_response.json()["access_token"]
-    token_type = token_response.json()["token_type"]
-
-    return {"Authorization": f"{token_type} {token}"}
 
 
 def test_create_organisation():
