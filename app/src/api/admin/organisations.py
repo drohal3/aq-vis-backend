@@ -1,5 +1,5 @@
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from src.models.organisation import (
     NewOrganisation,
     Organisation,
@@ -13,6 +13,8 @@ from src.database.operations import (
     device_operations,
 )
 from src.database import get_database
+from src.database.operations.auth import get_current_admin
+
 from src.exceptions import NotFoundException, DuplicateException
 import logging
 
@@ -20,7 +22,11 @@ router = APIRouter()
 
 
 @router.post("/", response_model=Organisation, status_code=201)
-async def create_organisation(form_data: NewOrganisation):
+async def create_organisation(
+    form_data: NewOrganisation,
+    current_admin: str = Depends(get_current_admin),
+):
+    logging.debug(f"creating organisation by admin: {current_admin}")
     database = get_database()
     created_organisation = organisation_operations.create_organisation(
         database, form_data
@@ -33,7 +39,10 @@ async def create_organisation(form_data: NewOrganisation):
 
 
 @router.put("/", response_model=Organisation)
-async def update_organisation(form_data: Organisation):
+async def update_organisation(
+    form_data: Organisation,
+    current_admin: str = Depends(get_current_admin),
+):
     database = get_database()
     # TODO: authenticate
     organisation_id = form_data.id
@@ -51,7 +60,10 @@ async def update_organisation(form_data: Organisation):
 
 
 @router.delete("/{organisation_id}", status_code=204)
-async def delete_organisation(organisation_id: str):
+async def delete_organisation(
+    organisation_id: str,
+    current_admin: str = Depends(get_current_admin),
+):
     database = get_database()
     organisation = organisation_operations.find_organisation(
         database, ObjectId(organisation_id)
@@ -69,7 +81,10 @@ async def delete_organisation(organisation_id: str):
 
 
 @router.get("/{organisation_id}", response_model=Organisation)
-async def get_organisation(organisation_id: str):
+async def get_organisation(
+    organisation_id: str,
+    current_admin: str = Depends(get_current_admin),
+):
     database = get_database()
     organisation = database.organisations.find_one(
         {"_id": ObjectId(organisation_id)}
@@ -90,7 +105,9 @@ async def get_organisation(organisation_id: str):
 
 
 @router.get("/", response_model=list[Organisation])
-async def get_organisations():
+async def get_organisations(
+    current_admin: str = Depends(get_current_admin),
+):
     database = get_database()
     organisations = database.organisations.find()
     ret = []
@@ -103,7 +120,10 @@ async def get_organisations():
 
 
 @router.post("/add_user")
-async def add_user(form_data: NewOrganisationMembership):
+async def add_user(
+    form_data: NewOrganisationMembership,
+    current_admin: str = Depends(get_current_admin),
+):
     # TODO: auth
     database = get_database()
     data = form_data.model_dump()
@@ -141,7 +161,10 @@ async def add_user(form_data: NewOrganisationMembership):
 
 
 @router.post("/remove_user")
-async def remove_user(form_data: NewOrganisationMembership):
+async def remove_user(
+    form_data: NewOrganisationMembership,
+    current_admin: str = Depends(get_current_admin),
+):
     database = get_database()
     data = form_data.model_dump()
     user_id = data["user"]
