@@ -21,6 +21,15 @@ def test_create_organisation():
         assert response.status_code == 201
 
 
+def test_create_organisation_unauthorized():
+    with TestClient(app) as client:
+        clean_database()
+        response = client.post(
+            "/admin/organisations", json=new_organisation_data
+        )
+        assert response.status_code == 401
+
+
 def test_get_organisation():
     with TestClient(app) as client:
         clean_database()
@@ -38,6 +47,17 @@ def test_get_organisation():
         )
         assert response.status_code == 200
         assert response.json()["id"] == new_organisation_id
+
+
+def test_get_organisation_unauthorized():
+    with TestClient(app) as client:
+        clean_database()
+        new_organisation_id = "000000000000000000000000"
+
+        response = client.get(
+            f"/admin/organisations/{new_organisation_id}",
+        )
+        assert response.status_code == 401
 
 
 def test_get_organisation_not_exist():
@@ -73,6 +93,18 @@ def test_delete_organisation():
         )
 
         assert response.status_code == 404
+
+
+def test_delete_organisation_unauthorized():
+    with TestClient(app) as client:
+        clean_database()
+
+        organisation_id = "000000000000000000000000"
+
+        response = client.delete(
+            f"/admin/organisations/{organisation_id}",
+        )
+        assert response.status_code == 401
 
 
 def test_delete_organisation_not_exist():
@@ -113,6 +145,27 @@ def test_add_and_remove_member():
             headers=get_admin_header(client),
         )
         assert response.status_code == 200
+
+
+def test_add_and_remove_member_unauthorized():
+    with TestClient(app) as client:
+        clean_database()
+
+        member_json = {
+            "organisation": "000000000000000000000000",
+            "user": "000000000000000000000000",
+        }
+        response = client.post(
+            "/admin/organisations/add_user",
+            json=member_json,
+        )
+        assert response.status_code == 401
+
+        response = client.post(
+            "/admin/organisations/remove_user",
+            json=member_json,
+        )
+        assert response.status_code == 401
 
 
 def test_add_member_already_exist():
