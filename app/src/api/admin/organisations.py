@@ -124,7 +124,6 @@ async def add_user(
     form_data: NewOrganisationMembership,
     current_admin: str = Depends(get_current_admin),
 ):
-    # TODO: auth
     database = get_database()
     data = form_data.model_dump()
     user_id = data["user"]
@@ -141,7 +140,6 @@ async def add_user(
         )
 
     try:
-        # TODO: add operation from operations __init__
         organisation_operations.add_membership(
             database, ObjectId(organisation_id), OrganisationMembership(**data)
         )
@@ -175,3 +173,6 @@ async def remove_user(
         )
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+# TODO: add device to organisation, remove device from organisation

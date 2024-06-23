@@ -10,8 +10,13 @@ def _transform_id(item):
     return item
 
 
-def find_device_by_id(database: Database, device_id: ObjectId) -> DeviceOut:
+def find_device_by_id(
+    database: Database, device_id: ObjectId
+) -> DeviceOut | None:
     device = database.devices.find_one({"_id": device_id})
+
+    if not device:
+        return None
 
     return DeviceOut(**_transform_id(device))
 
