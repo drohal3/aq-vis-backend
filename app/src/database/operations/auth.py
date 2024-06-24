@@ -3,10 +3,12 @@ from src.database.operations.user import find_unsecure_user_by_email
 from src.database import get_database
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
+
+from src.exceptions import UnauthorizedException
 from src.utils import config, DotEnvConfig
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
-from src.models.auth import TokenDataE
+from src.models.auth import TokenDataE, Token
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -112,3 +114,37 @@ def get_current_admin(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
 
     return "verified"  # return admin when multi-admin implemented
+
+
+def create_user_access_token(
+    database, email: str, password: str, expires_in_minutes: int = 15
+) -> Token:
+    user = get_auth_user(database, email=email, password=password)
+
+    access_token_expires = timedelta(minutes=int(expires_in_minutes))
+
+    access_token = create_login_access_token(
+        database, email=user["email"], expires_delta=access_token_expires
+    )
+
+    return Token(**{"access_token": access_token, "token_type": "Bearer"})
+
+
+def create_admin_access_token(
+    email: str, password: str, expires_in_minutes: int = 15
+) -> Token:
+    if not (
+        email == config.get_config(config.ENV_ADMIN_EMAIL)
+        and password == config.get_config(config.ENV_ADMIN_PASSWORD)
+    ):
+        raise UnauthorizedException()
+
+    access_token_expires = timedelta(minutes=int(expires_in_minutes))
+
+    data = {"sub": email}
+
+    access_token = create_access_token(
+        data, expires_delta=access_token_expires
+    )
+
+    return Token(**{"access_token": access_token, "token_type": "Bearer"})

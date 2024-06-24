@@ -6,10 +6,6 @@ from src.database import get_database, clean_database
 from test.data.user_json import new_user_json
 
 
-def setup_function():
-    pass
-
-
 def test_me():
     with TestClient(app) as client:
         clean_database()

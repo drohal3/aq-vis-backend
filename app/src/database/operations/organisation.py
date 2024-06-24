@@ -3,15 +3,15 @@ from bson import ObjectId
 from src.exceptions import NotFoundException, DuplicateException
 
 from src.models.organisation import (
-    Organisation,
-    NewOrganisation,
+    OrganisationOut,
+    OrganisationIn,
     OrganisationMembership,
 )
 
 
 def find_organisation(
     database: Database, organisation_id: ObjectId
-) -> Organisation | None:
+) -> OrganisationOut | None:
     organisation = database.organisations.find_one({"_id": organisation_id})
     if organisation is None:
         return organisation
@@ -23,12 +23,12 @@ def find_organisation(
         devices.append(str(device))
     organisation["devices"] = devices
 
-    return Organisation(**organisation)
+    return OrganisationOut(**organisation)
 
 
 def create_organisation(
-    database: Database, organisation_data: NewOrganisation
-) -> Organisation | None:
+    database: Database, organisation_data: OrganisationIn
+) -> OrganisationOut | None:
     data = organisation_data.model_dump()
     organisation_id = database.organisations.insert_one(data).inserted_id
     return find_organisation(database, organisation_id)
@@ -47,7 +47,7 @@ def add_membership(
     organisation = find_organisation(database, organisation_id)
 
     if not organisation:
-        raise NotFoundException
+        raise NotFoundException(f"Organisation {organisation_id} not found")
 
     organisation = organisation.model_dump()
     members = organisation["members"]
@@ -86,10 +86,13 @@ def add_device(
         {"_id": ObjectId(organisation_id)}
     )
 
+    if not organisation:
+        raise NotFoundException()
+
     devices = organisation.get("devices", [])
 
-    if device_id not in devices:
-        devices.append(str(device_id))
+    if device_id in devices:
+        raise DuplicateException()
 
     database.organisations.update_one(
         {"_id": ObjectId(organisation_id)}, {"$set": {"devices": devices}}

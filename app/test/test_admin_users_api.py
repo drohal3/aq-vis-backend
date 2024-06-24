@@ -11,13 +11,13 @@ def test_create_user_get_user_api():
         response = client.post(
             "admin/users",
             json=new_user_json[0],
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 201
 
         user_id = response.json()["id"]
         response = client.get(
-            f"admin/users/{user_id}", headers=get_admin_header(client)
+            f"admin/users/{user_id}", headers=get_admin_header()
         )
         assert response.status_code == 200
         assert response.json()["id"] == user_id
@@ -39,12 +39,12 @@ def test_create_duplicate_user_api():
         client.post(
             "admin/users",
             json=new_user_json[0],
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         response = client.post(
             "admin/users",
             json=new_user_json[0],
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 409
 
@@ -55,7 +55,7 @@ def test_delete_user_api():
         response = client.post(
             "admin/users",
             json=new_user_json[0],
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
 
         assert response.status_code == 201
@@ -63,12 +63,12 @@ def test_delete_user_api():
         user_id = response.json()["id"]
 
         response = client.delete(
-            f"admin/users/{user_id}", headers=get_admin_header(client)
+            f"admin/users/{user_id}", headers=get_admin_header()
         )
         assert response.status_code == 204
 
         response = client.get(
-            f"admin/users/{user_id}", headers=get_admin_header(client)
+            f"admin/users/{user_id}", headers=get_admin_header()
         )
         assert response.status_code == 404
 

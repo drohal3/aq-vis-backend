@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from src.main import app
 from src.database import get_database, clean_database
 from bson import ObjectId
-from src.models.organisation import NewOrganisation, OrganisationMembership
+from src.models.organisation import OrganisationIn, OrganisationMembership
 from src.database.operations import organisation_operations
 from test.data.organisation_json import new_organisation_json
 from src.exceptions import DuplicateException, NotFoundException
@@ -16,7 +16,7 @@ def test_create_organisation_find_organisation():
         clean_database()
         database = get_database()
         new_organisation = organisation_operations.create_organisation(
-            database, NewOrganisation(**new_organisation_json_data)
+            database, OrganisationIn(**new_organisation_json_data)
         )
         new_organisation_id = new_organisation.id
         organisation = organisation_operations.find_organisation(
@@ -30,7 +30,7 @@ def test_delete_organisation():
         clean_database()
         database = get_database()
         new_organisation = organisation_operations.create_organisation(
-            database, NewOrganisation(**new_organisation_json_data)
+            database, OrganisationIn(**new_organisation_json_data)
         )
         new_organisation_id = new_organisation.id
         organisation_operations.delete_organisation(
@@ -47,7 +47,7 @@ def test_add_membership():
         clean_database()
         database = get_database()
         new_organisation = organisation_operations.create_organisation(
-            database, NewOrganisation(**new_organisation_json_data)
+            database, OrganisationIn(**new_organisation_json_data)
         )
         new_organisation_id = new_organisation.id
 
@@ -72,7 +72,7 @@ def test_add_duplicate_membership():
         clean_database()
         database = get_database()
         new_organisation = organisation_operations.create_organisation(
-            database, NewOrganisation(**new_organisation_json_data)
+            database, OrganisationIn(**new_organisation_json_data)
         )
         new_organisation_id = new_organisation.id
 
@@ -118,7 +118,7 @@ def test_remove_membership():
         clean_database()
         database = get_database()
         new_organisation = organisation_operations.create_organisation(
-            database, NewOrganisation(**new_organisation_json_data)
+            database, OrganisationIn(**new_organisation_json_data)
         )
 
         some_id_1 = "000000000000000000000000"

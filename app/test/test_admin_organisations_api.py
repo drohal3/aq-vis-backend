@@ -16,7 +16,7 @@ def test_create_organisation_api():
         response = client.post(
             "/admin/organisations",
             json=new_organisation_data,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 201
 
@@ -36,14 +36,14 @@ def test_get_organisation_api():
         new_organisation = client.post(
             "/admin/organisations",
             json=new_organisation_data,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
 
         new_organisation_id = new_organisation.json()["id"]
 
         response = client.get(
             f"/admin/organisations/{new_organisation_id}",
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 200
         assert response.json()["id"] == new_organisation_id
@@ -66,7 +66,7 @@ def test_get_organisation_api_not_exist():
         new_organisation_id = "000000000000000000000000"
         response = client.get(
             f"/admin/organisations/{new_organisation_id}",
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 404
 
@@ -77,19 +77,19 @@ def test_delete_organisation_api():
         response = client.post(
             "/admin/organisations",
             json=new_organisation_data,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         organisation_id = response.json()["id"]
 
         response = client.delete(
             f"/admin/organisations/{organisation_id}",
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 204
 
         response = client.get(
             f"/admin/organisations/{organisation_id}",
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
 
         assert response.status_code == 404
@@ -112,7 +112,7 @@ def test_delete_organisation_api_not_exist():
         clean_database()
         some_id = "000000000000000000000000"
         response = client.delete(
-            f"/admin/organisations/{some_id}", headers=get_admin_header(client)
+            f"/admin/organisations/{some_id}", headers=get_admin_header()
         )
         assert response.status_code == 404
 
@@ -123,11 +123,11 @@ def test_add_and_remove_member_api():
         organisation_response = client.post(
             "/admin/organisations",
             json=new_organisation_data,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         organisation_id = organisation_response.json()["id"]
         user_response = client.post(
-            "admin/users", json=new_user_data, headers=get_admin_header(client)
+            "admin/users", json=new_user_data, headers=get_admin_header()
         )
         user_id = user_response.json()["id"]
 
@@ -135,14 +135,14 @@ def test_add_and_remove_member_api():
         response = client.post(
             "/admin/organisations/add_user",
             json=member_json,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 200
 
         response = client.post(
             "/admin/organisations/remove_user",
             json=member_json,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         assert response.status_code == 200
 
@@ -175,12 +175,12 @@ def test_add_member_api_already_exist():
         organisation_response = client.post(
             "/admin/organisations",
             json=new_organisation_data,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         organisation_id = organisation_response.json()["id"]
 
         user_response = client.post(
-            "admin/users", json=new_user_data, headers=get_admin_header(client)
+            "admin/users", json=new_user_data, headers=get_admin_header()
         )
         user_id = user_response.json()["id"]
 
@@ -189,12 +189,12 @@ def test_add_member_api_already_exist():
         client.post(
             "/admin/organisations/add_user",
             json=member_json,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
         response = client.post(
             "/admin/organisations/add_user",
             json=member_json,
-            headers=get_admin_header(client),
+            headers=get_admin_header(),
         )
 
         assert response.status_code == 409

@@ -2,6 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.dependencies.authentication import get_current_active_user
+from src.exceptions import DuplicateException
 from src.models.device import DeviceOut, DeviceIn
 from src.models.user import UserOut
 from src.database import get_database
@@ -12,7 +13,7 @@ import logging
 router = APIRouter()
 
 
-@router.post("", response_model=DeviceOut)
+@router.post("", response_model=DeviceOut, status_code=201)
 async def create_device(
     form_data: DeviceIn,
     current_user: UserOut = Depends(get_current_active_user),
@@ -28,12 +29,22 @@ async def create_device(
     if not current_user.organisation == str(organisation["_id"]):
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
+    if not form_data.organisation == current_user.organisation:
+        raise HTTPException(status_code=401, detail="Unauthorized!")
+
     device = device_operations.create_device(database, form_data)
     device_id = device.id
 
-    organisation_operations.add_device(
-        database, ObjectId(organisation_id), ObjectId(device_id)
-    )
+    try:
+        organisation_operations.add_device(
+            database, ObjectId(organisation_id), ObjectId(device_id)
+        )
+    except DuplicateException:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Device {device_id} "
+            f"already belongs to organisation {organisation_id}",
+        )
 
     return device
 
@@ -45,6 +56,13 @@ async def update_device(
     current_user: UserOut = Depends(get_current_active_user),
 ):
     database = get_database()
+    device = device_operations.find_device_by_id(database, ObjectId(device_id))
+    if not device:
+        raise HTTPException(
+            status_code=404, detail=f"Device {device_id} not found"
+        )
+    if device.organisation != current_user.organisation:
+        raise HTTPException(status_code=401, detail="Unauthorized!")
     device = device_operations.update_device(
         database, ObjectId(device_id), form_data
     )
@@ -56,23 +74,29 @@ async def get_devices(
     organisation_id: str,
     current_user: UserOut = Depends(get_current_active_user),
 ):
+    message = "use /organisations/{organisation_id}/devices endpoint instead!"
+    return {"error": message}
+
+
+@router.get("/{device_id}", response_model=DeviceOut, status_code=200)
+async def get_device(
+    device_id: str, current_user: UserOut = Depends(get_current_active_user)
+):
     database = get_database()
-    organisation = organisation_operations.find_organisation(
-        database, ObjectId(organisation_id)
-    )
-    if not organisation:
-        raise HTTPException(status_code=404, detail="Organisation not found!")
-    if not current_user.organisation == str(organisation["_id"]):
-        raise HTTPException(status_code=401, detail="Unauthorized!")
+    device = device_operations.find_device_by_id(database, ObjectId(device_id))
 
-    devices = device_operations.find_devices_by_organisation(
-        database, ObjectId(organisation_id)
-    )
+    if not device:
+        raise HTTPException(
+            status_code=404, detail=f"Device {device_id} not found"
+        )
 
-    return devices
+    if device.organisation != current_user.organisation:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    return device
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=204)
 async def delete_device(
     id: str, current_user: UserOut = Depends(get_current_active_user)
 ):
