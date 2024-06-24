@@ -19,9 +19,9 @@ class OrganisationBase(BaseModel):
     members: list[OrganisationMembership] = list
 
 
-class Organisation(OrganisationBase):
+class OrganisationOut(OrganisationBase):
     id: str
 
 
-class NewOrganisation(OrganisationBase):
+class OrganisationIn(OrganisationBase):
     pass

@@ -3,10 +3,12 @@ from src.database.operations.user import find_unsecure_user_by_email
 from src.database import get_database
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
+
+from src.exceptions import UnauthorizedException
 from src.utils import config, DotEnvConfig
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
-from src.models.auth import TokenDataE
+from src.models.auth import TokenDataE, Token
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,7 +25,7 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def _create_access_token(
+def create_access_token(
     data: dict, expires_delta: timedelta or None = None
 ) -> str:
     to_encode = data.copy()
@@ -44,7 +46,7 @@ def create_login_access_token(
     # TODO: token can be stored in database so it can be invalidated
     data = {"sub": email}
 
-    return _create_access_token(data, expires_delta)
+    return create_access_token(data, expires_delta)
 
 
 def get_auth_user(database, email: str, password: str):
@@ -67,12 +69,14 @@ def get_auth_user(database, email: str, password: str):
     return user
 
 
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+
 def get_current_user(database, token: str):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
@@ -97,3 +101,50 @@ def get_current_active_user(
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+def get_current_admin(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            # print("No username")
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    return "verified"  # return admin when multi-admin implemented
+
+
+def create_user_access_token(
+    database, email: str, password: str, expires_in_minutes: int = 15
+) -> Token:
+    user = get_auth_user(database, email=email, password=password)
+
+    access_token_expires = timedelta(minutes=int(expires_in_minutes))
+
+    access_token = create_login_access_token(
+        database, email=user["email"], expires_delta=access_token_expires
+    )
+
+    return Token(**{"access_token": access_token, "token_type": "Bearer"})
+
+
+def create_admin_access_token(
+    email: str, password: str, expires_in_minutes: int = 15
+) -> Token:
+    if not (
+        email == config.get_config(config.ENV_ADMIN_EMAIL)
+        and password == config.get_config(config.ENV_ADMIN_PASSWORD)
+    ):
+        raise UnauthorizedException()
+
+    access_token_expires = timedelta(minutes=int(expires_in_minutes))
+
+    data = {"sub": email}
+
+    access_token = create_access_token(
+        data, expires_delta=access_token_expires
+    )
+
+    return Token(**{"access_token": access_token, "token_type": "Bearer"})

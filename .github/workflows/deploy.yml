@@ -19,6 +19,8 @@ jobs:
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       MONGODB_CONNECTION_URI_TEST: ${{ secrets.MONGODB_CONNECTION_URI_TEST }}
       DB_NAME_TEST: ${{ secrets.DB_NAME_TEST }}
+      ADMIN_EMAIL: "test@test.test"
+      ADMIN_PASSWORD: "test123Passw0rd"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python

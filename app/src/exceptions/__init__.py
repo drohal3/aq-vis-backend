@@ -1,6 +1,3 @@
-# from fastapi import HTTPException
-
-
 class NotFoundException(Exception):
     def __init__(self, detail: str = "Not found!"):
         super().__init__(detail)
@@ -11,6 +8,11 @@ class DuplicateException(Exception):
         super().__init__(detail)
 
 
+class UnauthorizedException(Exception):
+    def __init__(self, detail: str = "Unauthorized!"):
+        super().__init__(detail)
+
+
 # class ItemNotFoundHTTPException(HTTPException):
 #     def __init__(self, identifier: str):
 #         super().__init__(
@@ -18,4 +20,4 @@ class DuplicateException(Exception):
 #             detail=f"Item with identifier {identifier} not found",
 #         )
 
-__all__ = ["NotFoundException", "DuplicateException"]
+__all__ = ["NotFoundException", "DuplicateException", "UnauthorizedException"]

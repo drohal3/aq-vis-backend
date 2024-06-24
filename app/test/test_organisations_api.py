@@ -1,108 +1,105 @@
 from fastapi.testclient import TestClient
 from src.main import app
-from src.database import clean_database
+from src.database import clean_database, get_database
+from src.database.operations.device import create_device
+from src.models.device import DeviceIn
+from src.models.organisation import OrganisationIn
+from src.models.user import UserIn
 
+from test.functions import create_test_user_with_organisation, get_user_header
 from test.data.organisation_json import new_organisation_json
 from test.data.user_json import new_user_json
-
-new_organisation_data = new_organisation_json[0]
-new_user_data = new_user_json[0]
+from test.data.device_json import new_device_json
 
 
-def test_create_organisation():
+def test_get_organisation_api():
     with TestClient(app) as client:
         clean_database()
-        response = client.post(
-            "/admin/organisations", json=new_organisation_data
+        database = get_database()
+        user_in = UserIn(**new_user_json[0])
+        organisation_in = OrganisationIn(**new_organisation_json[0])
+
+        user = create_test_user_with_organisation(
+            database, True, user_in, organisation_in
         )
-        assert response.status_code == 201
-
-
-def test_get_organisation():
-    with TestClient(app) as client:
-        clean_database()
-        new_organisation = client.post(
-            "/admin/organisations", json=new_organisation_data
+        organisation_id = user.organisation
+        response = client.get(
+            f"/organisations/{organisation_id}",
+            headers=get_user_header(database, user_in, False),
         )
 
-        new_organisation_id = new_organisation.json()["id"]
-
-        response = client.get(f"/admin/organisations/{new_organisation_id}")
         assert response.status_code == 200
-        assert response.json()["id"] == new_organisation_id
+        assert response.json()["id"] == organisation_id
 
 
-def test_get_organisation_not_exist():
+def test_get_organisation_api_unauthorized():
     with TestClient(app) as client:
         clean_database()
-        new_organisation_id = "000000000000000000000000"
-        response = client.get(f"/admin/organisations/{new_organisation_id}")
-        assert response.status_code == 404
+        database = get_database()
+        user_in = UserIn(**new_user_json[0])
+        user_in_1 = UserIn(**new_user_json[1])
+        organisation_in = OrganisationIn(**new_organisation_json[0])
+        organisation_in_1 = OrganisationIn(**new_organisation_json[1])
 
-
-def test_delete_organisation():
-    with TestClient(app) as client:
-        clean_database()
-        response = client.post(
-            "/admin/organisations", json=new_organisation_data
+        user = create_test_user_with_organisation(
+            database, True, user_in, organisation_in
         )
-        organisation_id = response.json()["id"]
-
-        response = client.delete(f"/admin/organisations/{organisation_id}")
-        assert response.status_code == 204
-
-        response = client.get(f"/admin/organisations/{organisation_id}")
-
-        assert response.status_code == 404
-
-
-def test_delete_organisation_not_exist():
-    with TestClient(app) as client:
-        clean_database()
-        some_id = "000000000000000000000000"
-        response = client.delete(f"/admin/organisations/{some_id}")
-        assert response.status_code == 404
-
-
-def test_add_and_remove_member():
-    with TestClient(app) as client:
-        clean_database()
-        organisation_response = client.post(
-            "/admin/organisations", json=new_organisation_data
+        create_test_user_with_organisation(
+            database, True, user_in_1, organisation_in_1
         )
-        organisation_id = organisation_response.json()["id"]
-        user_response = client.post("admin/users", json=new_user_data)
-        user_id = user_response.json()["id"]
+        organisation_id = user.organisation
+        response = client.get(
+            f"/organisations/{organisation_id}",
+            headers=get_user_header(database, user_in_1, False),
+        )
 
-        member_json = {"organisation": organisation_id, "user": user_id}
-        response = client.post(
-            "/admin/organisations/add_user", json=member_json
+        assert response.status_code == 401
+
+
+def test_get_devices_api():
+    with TestClient(app) as client:
+        clean_database()
+        database = get_database()
+        user_in = UserIn(**new_user_json[0])
+        organisation_in = OrganisationIn(**new_organisation_json[0])
+
+        user = create_test_user_with_organisation(
+            database, True, user_in, organisation_in
+        )
+        organisation_id = user.organisation
+        device_in_data = new_device_json[0].copy()
+        device_in_data["organisation"] = organisation_id
+        device_in = DeviceIn(**device_in_data)
+
+        new_device = create_device(database, device_in)
+
+        response = client.get(
+            f"/organisations/{organisation_id}/devices",
+            headers=get_user_header(database, user_in, False),
         )
         assert response.status_code == 200
 
-        response = client.post(
-            "/admin/organisations/remove_user", json=member_json
-        )
-        assert response.status_code == 200
+        assert response.json()[0]["id"] == new_device.id
 
 
-def test_add_member_already_exist():
+def test_get_devices_api_unauthorized():
     with TestClient(app) as client:
         clean_database()
-
-        organisation_response = client.post(
-            "/admin/organisations", json=new_organisation_data
+        database = get_database()
+        user_in = UserIn(**new_user_json[0])
+        user_in_1 = UserIn(**new_user_json[1])
+        organisation_in = OrganisationIn(**new_organisation_json[0])
+        organisation_in_1 = OrganisationIn(**new_organisation_json[1])
+        user = create_test_user_with_organisation(
+            database, True, user_in, organisation_in
         )
-        organisation_id = organisation_response.json()["id"]
-
-        user_response = client.post("admin/users", json=new_user_data)
-        user_id = user_response.json()["id"]
-
-        member_json = {"organisation": organisation_id, "user": user_id}
-
-        client.post("/admin/organisations/add_user", json=member_json)
-        response = client.post(
-            "/admin/organisations/add_user", json=member_json
+        create_test_user_with_organisation(
+            database, True, user_in_1, organisation_in_1
         )
+        organisation_id = user.organisation
 
-        assert response.status_code == 409
+        response = client.get(
+            f"/organisations/{organisation_id}/devices",
+            headers=get_user_header(database, user_in_1, False),
+        )
+        assert response.status_code == 401

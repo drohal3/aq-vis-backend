@@ -19,6 +19,9 @@ class DotEnvConfig:
 
     PYTEST_CURRENT_TEST = "PYTEST_CURRENT_TEST"
 
+    ENV_ADMIN_EMAIL = "ADMIN_EMAIL"
+    ENV_ADMIN_PASSWORD = "ADMIN_PASSWORD"
+
     def __init__(self):
         load_dotenv(".env")
 

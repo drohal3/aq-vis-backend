@@ -50,6 +50,11 @@ docker exec -it app-backend black .
 | `AWS_ACCESS_KEY_ID`           | access key from AWS                           |                                                                             |
 | `AWS_SECRET_ACCESS_KEY`       | secret access key from AWS                    |                                                                             |
 | `AWS_REGION_NAME`             | AWS region name                               | example: `eu-central-1`                                                     |
+| **administration**            |                                               |                                                                             |
+| `ADMIN_EMAIL`                 | admin email                                   |                                                                             |
+| `ADMIN_PASSWORD`              | admin password                                |                                                                             |
+
+
 
 To generate `SECRET_KEY`, run
 ```bash
