@@ -19,7 +19,7 @@ async def get_organisation(
     database: Database = Depends(get_database),
     current_user: UserOut = Depends(get_current_active_user),
 ):
-    if not current_user["organisation"] == str(organisation_id):
+    if not current_user.organisation == str(organisation_id):
         raise HTTPException(401, detail="Unauthorized!")
 
     organisation = organisation_operations.find_organisation(
@@ -45,7 +45,7 @@ async def get_devices(
     )
     if not organisation:
         raise HTTPException(status_code=404, detail="Organisation not found!")
-    if not current_user.organisation == str(organisation["_id"]):
+    if not current_user.organisation == organisation.id:
         raise HTTPException(status_code=401, detail="Unauthorized!")
 
     devices = device_operations.find_devices_by_organisation(
