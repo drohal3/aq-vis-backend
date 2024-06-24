@@ -53,9 +53,3 @@ async def get_devices(
     )
 
     return devices
-
-
-@router.get("/{organisation_id}/members", response_model=list[UserOut])
-async def get_members():
-    # TODO:
-    return []
