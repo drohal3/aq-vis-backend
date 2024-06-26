@@ -34,7 +34,9 @@ def find_devices_by_organisation(
 
 
 def create_device(database: Database, device_data: DeviceIn) -> DeviceOut:
-    device_id = database.devices.insert_one(device_data.dict()).inserted_id
+    device_id = database.devices.insert_one(
+        device_data.model_dump()
+    ).inserted_id
     return find_device_by_id(database, device_id)
 
 
