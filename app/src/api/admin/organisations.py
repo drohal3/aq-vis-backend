@@ -20,7 +20,7 @@ import logging
 router = APIRouter()
 
 
-@router.post("/", response_model=OrganisationOut, status_code=201)
+@router.post("", response_model=OrganisationOut, status_code=201)
 async def create_organisation(
     form_data: OrganisationIn,
     current_admin: str = Depends(get_current_admin),
@@ -37,7 +37,7 @@ async def create_organisation(
     return created_organisation
 
 
-@router.put("/", response_model=OrganisationOut)
+@router.put("", response_model=OrganisationOut)
 async def update_organisation(
     form_data: OrganisationOut,
     current_admin: str = Depends(get_current_admin),
@@ -103,7 +103,7 @@ async def get_organisation(
     return organisation
 
 
-@router.get("/", response_model=list[OrganisationOut])
+@router.get("", response_model=list[OrganisationOut])
 async def get_organisations(
     current_admin: str = Depends(get_current_admin),
 ):
