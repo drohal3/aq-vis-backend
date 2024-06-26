@@ -62,7 +62,7 @@ async def update_user(
         )
 
     updated_user_data = user_to_update.copy(
-        update=form_data.dict(exclude_unset=True)
+        update=form_data.model_dump(exclude_unset=True)
     )
 
     user_operations.update_user(database, ObjectId(user_id), updated_user_data)

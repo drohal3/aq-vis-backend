@@ -8,30 +8,6 @@ To run locally, listed commands require docker engine and docker-compose tool to
 
 The app can be run directly on the host machine. See commands in appropriate `Dockerfile` for more details how to run the app with Linux OS.
 
-## Instructions
->**Note:** Instructions for querying data for third-parties are documented on the separate website: https://idealaq.github.io/cpcvis-data-docs/
-
-To run the backend locally, run 
-```bash
-docker-compose -f ./docker-compose.dev.yml up
-```
-To open Swagger UI (for API documentation), visit http://127.0.0.1:8080/docs
-
-To run tests, run while running backend in container: 
-```bash
-docker exec -it app-backend pytest .
-```
-
-To check linting, run while running backend in container:
-```bash
-docker exec -it app-backend flake8 .
-```
-
-To reformat files:
-```bash
-docker exec -it app-backend black .
-```
-
 ## ENV Variables
 > **WARNING:** The database used to run tests must be different from database used to run the app. Otherwise, all application data might ger corrupted or lost. 
 
@@ -55,13 +31,38 @@ docker exec -it app-backend black .
 | `ADMIN_PASSWORD`              | admin password                                |                                                                             |
 
 
-
 To generate `SECRET_KEY`, run
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
+
+## Useful commands
+>**Note:** Instructions for querying data for third-parties are documented on the separate website: https://idealaq.github.io/cpcvis-data-docs/
+
+To run the backend locally, run 
+```bash
+docker-compose -f ./docker-compose.dev.yml up
+```
+To open Swagger UI (for API documentation), visit http://127.0.0.1:8080/docs
+
+To run tests, run while running backend in container: 
+```bash
+docker exec -it app-backend pytest .
+```
+
+To check linting, run while running backend in container:
+```bash
+docker exec -it app-backend flake8 .
+```
+
+To reformat files:
+```bash
+docker exec -it app-backend black .
+```
+
+
 ## Limitations
 > The communication with the database is implemented with pymongo which causes blocking operations. To benefit from asynchronous FastAPI, transition to i.e. motor is needed.
 > ***
-> However, motor is built on top of pymongo and syntax is mostly compatible making the transition smooth.
+> However, motor is built on top of pymongo and syntax is mostly compatible making the transition smooth. Nevertheless, due to the intended purpose of the application, it should not make much difference.
