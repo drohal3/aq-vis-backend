@@ -8,6 +8,7 @@ on:
     types: [ opened, synchronize ]
 jobs:
   pipeline:
+    if: ${{ github.event_name != 'push'}}
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -52,7 +53,7 @@ jobs:
   publish-ecr:
     name: Publish image to AWS ECR
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ pipeline ]
+#    needs: [ pipeline ]
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout source
@@ -99,7 +100,7 @@ jobs:
   publish-docker-hub:
     name: Publish image to Docker Hub
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-    needs: [ pipeline ]
+#    needs: [ pipeline ]
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout to the repository

@@ -26,7 +26,7 @@ async def get_user(
     return user
 
 
-@router.post("/", response_model=UserOut, status_code=201)
+@router.post("", response_model=UserOut, status_code=201)
 async def create_user(
     form_data: UserIn, current_admin: str = Depends(get_current_admin)
 ):
