@@ -127,7 +127,7 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: info
-          text: New version of cpcvis-backend image published
+          text: New version of aqvis-backend image published
           description: By ${{ github.triggering_actor }}
           details: Published successfully!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
@@ -137,7 +137,7 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
-          text: New version of cpcvis-backend image could not be published!
+          text: New version of aqvis-backend image could not be published!
           description: Triggered by ${{ github.triggering_actor }}, commit urls ${{ join(github.event.commits.*.url, ' , ') }}
           details: Publishing Failed!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
