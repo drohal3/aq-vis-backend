@@ -5,7 +5,7 @@ from src.utils.config import DotEnvConfig
 from src.dependencies.authentication import get_current_active_user
 from src.models.user import UserOut
 
-TABLE = "cpc_measurements_test"
+TABLE = "aq_measurements"
 
 router = APIRouter()
 config = DotEnvConfig()
@@ -20,6 +20,7 @@ def read_items(
     current_user: UserOut = Depends(get_current_active_user),
 ):
     # TODO: make parameters optional
+    # TODO: auth
     dynamodb = boto3.resource(
         "dynamodb",
         aws_access_key_id=config.get_config(config.ENV_AWS_ACCESS_KEY_ID),
@@ -33,8 +34,8 @@ def read_items(
     # DATE_FROM = '2023-11-23 12:30:00'
     # DATE_TO = '2023-11-23 13:30:00'
     response = table.query(
-        KeyConditionExpression=Key("device_id").eq(int(device))
-        & Key("sample_date_time").between(time_from, time_to),
+        KeyConditionExpression=Key("device_id").eq(device)
+        & Key("time").between(time_from, time_to),
     )
 
     filtered = []
@@ -43,7 +44,7 @@ def read_items(
         wanted_keys = parameters.split(",")
         bigdict = item["sample_data"]
         data = dict((k, bigdict[k]) for k in wanted_keys if k in bigdict)
-        data["sample_date_time"] = item["sample_date_time"]
+        data["time"] = item["time"]
         filtered.append(data)
     return filtered
 
