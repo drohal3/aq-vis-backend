@@ -10,6 +10,12 @@ from src.database.operations import user_operations
 
 router = APIRouter()
 
+@router.get("", response_model=list[UserOut])
+async def get_all_users(
+    current_admin: str = Depends(get_current_admin)
+):
+    database = get_database()
+    return user_operations.find_all_users(database)
 
 @router.get("/{user_id}", response_model=UserOut)
 async def get_user(
