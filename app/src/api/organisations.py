@@ -4,7 +4,7 @@ from pymongo.database import Database
 
 from src.database.operations.auth import get_current_active_user
 from src.models.device import DeviceOut
-from src.models.organisation import OrganisationOut
+from src.models.organisation import OrganisationWithMembers
 from src.models.user import UserOut
 from src.database import get_database
 from src.database.operations import organisation_operations, device_operations
@@ -13,7 +13,7 @@ from src.database.operations import organisation_operations, device_operations
 router = APIRouter()
 
 
-@router.get("/{organisation_id}", response_model=OrganisationOut)
+@router.get("/{organisation_id}", response_model=OrganisationWithMembers)
 async def get_organisation(
     organisation_id: str,
     database: Database = Depends(get_database),
@@ -22,7 +22,7 @@ async def get_organisation(
     if not current_user.organisation == str(organisation_id):
         raise HTTPException(401, detail="Unauthorized!")
 
-    organisation = organisation_operations.find_organisation(
+    organisation = organisation_operations.find_organisation_with_members(
         database, ObjectId(organisation_id)
     )
 
