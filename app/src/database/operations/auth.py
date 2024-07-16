@@ -1,3 +1,5 @@
+import time
+
 from passlib.context import CryptContext
 from src.database.operations.user import find_unsecure_user_by_email
 from src.database import get_database
@@ -69,10 +71,8 @@ def get_auth_user(database, email: str, password: str):
     return user
 
 
-credentials_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
+credentials_exception = UnauthorizedException(
+    "Invalid token."
 )
 
 
@@ -80,15 +80,16 @@ def get_current_user(database, token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
+        expires = payload.get("exp", 0)
+        if expires < time.time():
+            raise credentials_exception
         if email is None:
-            # print("No username")
             raise credentials_exception
         token_tada = TokenDataE(email=email)
     except JWTError:
         raise credentials_exception
     user = find_unsecure_user_by_email(database, token_tada.email)
     if user is None:
-        # print("no user")
         raise credentials_exception
 
     return user
@@ -97,7 +98,14 @@ def get_current_user(database, token: str):
 def get_current_active_user(
     database=Depends(get_database), token: str = Depends(oauth2_scheme)
 ):
-    current_user = get_current_user(database, token)
+    try:
+        current_user = get_current_user(database, token)
+    except UnauthorizedException:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
