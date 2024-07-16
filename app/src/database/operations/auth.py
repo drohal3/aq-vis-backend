@@ -71,9 +71,7 @@ def get_auth_user(database, email: str, password: str):
     return user
 
 
-credentials_exception = UnauthorizedException(
-    "Invalid token."
-)
+credentials_exception = UnauthorizedException("Invalid token.")
 
 
 def get_current_user(database, token: str):

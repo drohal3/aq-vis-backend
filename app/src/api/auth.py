@@ -20,5 +20,8 @@ async def login_for_token(
 ):
     logging.debug("login_for_token()")
     return create_user_access_token(
-        database, form_data.username, form_data.password, config.get_config(config.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+        database,
+        form_data.username,
+        form_data.password,
+        config.get_config(config.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES),
     )
