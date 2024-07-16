@@ -20,6 +20,15 @@ def find_user(database: Database, user_id: ObjectId) -> UserOut | None:
     return UserOut(**user)
 
 
+def find_all_users(database: Database) -> list[UserOut]:
+    users = database.users.find({}, {"hashed_password": 0})
+    ret = []
+    for user in users:
+        user["id"] = str(user["_id"])
+        ret.append(UserOut(**user))
+    return ret
+
+
 def find_unsecure_user(
     database: Database, user_id: ObjectId
 ) -> UserInDB | None:

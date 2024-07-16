@@ -8,6 +8,8 @@ from src.database.operations.auth import (
     create_user_access_token,
 )
 
+from src.utils import config
+
 router = APIRouter()
 
 
@@ -16,8 +18,10 @@ async def login_for_token(
     database=Depends(get_database),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
-    # TODO: use _id instead of username!
     logging.debug("login_for_token()")
     return create_user_access_token(
-        database, form_data.username, form_data.password, 6 * 60
+        database,
+        form_data.username,
+        form_data.password,
+        config.get_config(config.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES),
     )

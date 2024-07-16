@@ -1,11 +1,13 @@
 from pymongo.database import Database
 from bson import ObjectId
 from src.exceptions import NotFoundException, DuplicateException
-
+from src.database.operations import user_operations
 from src.models.organisation import (
     OrganisationOut,
+    OrganisationWithMembers,
     OrganisationIn,
     OrganisationMembership,
+    OrganisationMember,
 )
 
 
@@ -19,11 +21,38 @@ def find_organisation(
 
     devices = []
 
-    for device in organisation["devices"]:
+    for device in organisation.get("devices", []):
         devices.append(str(device))
     organisation["devices"] = devices
 
     return OrganisationOut(**organisation)
+
+
+def _load_members_to_organisation(
+    database: Database, organisation: OrganisationOut
+) -> OrganisationWithMembers:
+    members = []
+    for membership in organisation.memberships:
+        user = user_operations.find_user(
+            database, ObjectId(membership.user)
+        ).model_dump()
+        user["is_admin"] = membership.is_admin
+        member = OrganisationMember(**user)
+        members.append(member)
+    # del organisation["memberships"]
+
+    organisation = organisation.model_dump()
+    organisation["members"] = members
+
+    return OrganisationWithMembers(**organisation)
+
+
+def find_organisation_with_members(
+    database: Database, organisation_id: ObjectId
+) -> OrganisationWithMembers:
+    organisation_out = find_organisation(database, organisation_id)
+
+    return _load_members_to_organisation(database, organisation_out)
 
 
 def create_organisation(
@@ -50,15 +79,16 @@ def add_membership(
         raise NotFoundException(f"Organisation {organisation_id} not found")
 
     organisation = organisation.model_dump()
-    members = organisation["members"]
+    memberships = organisation["memberships"]
 
-    for member in members:
+    for member in memberships:
         if member["user"] == membership_data["user"]:
             raise DuplicateException()
 
-    members.append(membership_data)
+    memberships.append(membership_data)
     database.organisations.update_one(
-        {"_id": ObjectId(organisation_id)}, {"$set": {"members": members}}
+        {"_id": ObjectId(organisation_id)},
+        {"$set": {"memberships": memberships}},
     )
 
 
@@ -69,13 +99,13 @@ def remove_membership(
     if not organisation:
         raise NotFoundException(f"Organisation {organisation_id} not found")
     organisation = organisation.model_dump()
-    members = organisation["members"]
-    members_new = []
-    for member in members:
+    memberships = organisation["memberships"]
+    memberships_new = []
+    for member in memberships:
         if member["user"] != str(user_id):
-            members_new.append(member)
+            memberships_new.append(member)
     database.organisations.update_one(
-        {"_id": organisation_id}, {"$set": {"members": members_new}}
+        {"_id": organisation_id}, {"$set": {"memberships": memberships_new}}
     )
 
 

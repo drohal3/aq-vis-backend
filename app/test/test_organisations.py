@@ -63,8 +63,8 @@ def test_add_membership():
             database, ObjectId(new_organisation_id)
         )
 
-        assert organisation.members[0].user == some_id
-        assert len(organisation.members) == 1
+        assert organisation.memberships[0].user == some_id
+        assert len(organisation.memberships) == 1
 
 
 def test_add_duplicate_membership():
@@ -96,7 +96,7 @@ def test_add_duplicate_membership():
         organisation = organisation_operations.find_organisation(
             database, ObjectId(new_organisation.id)
         )
-        assert len(organisation.members) == 1
+        assert len(organisation.memberships) == 1
 
 
 def test_add_membership_organisation_not_exist():
@@ -142,9 +142,9 @@ def test_remove_membership():
         )
 
         assert (
-            organisation.members[0].user == some_id_2
+            organisation.memberships[0].user == some_id_2
         )  # only second id present
-        assert len(organisation.members) == 1
+        assert len(organisation.memberships) == 1
 
 
 def test_remove_membership_not_exist():
