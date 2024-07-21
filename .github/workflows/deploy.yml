@@ -121,7 +121,7 @@ jobs:
       - name: Build and push tagged
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}"
+          context: "{{defaultContext}}:app"
           push: true
           tags: drohal3/aqvis-backend:${{ github.sha }}
   notify:
