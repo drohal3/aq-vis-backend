@@ -25,14 +25,18 @@ async def create_organisation(
     form_data: OrganisationIn,
     current_admin: str = Depends(get_current_admin),
 ):
-    logging.debug(f"creating organisation by admin: {current_admin}")
+    logging.info(f"creating organisation by admin: {current_admin}")
     database = get_database()
-    created_organisation = organisation_operations.create_organisation(
-        database, form_data
-    )
+    try:
+        created_organisation = organisation_operations.create_organisation(
+            database, form_data
+        )
+    except Exception as e:
+        logging.exception(e)
+        raise HTTPException(status_code=500, detail="Unexpected error")
 
     # need to rename _id to id since _id is reserved in Python
-    logging.debug(f"Created organisation: {created_organisation}")
+    logging.info(f"Created organisation: {created_organisation}")
 
     return created_organisation
 
