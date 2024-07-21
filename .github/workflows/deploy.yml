@@ -117,7 +117,7 @@ jobs:
         with:
           context: "{{defaultContext}}:app"
           push: true
-          tags: drohal3/cpcvis-backend:latest
+          tags: drohal3/aqvis-backend:latest
       - name: Build and push tagged
         uses: docker/build-push-action@v5
         with:
