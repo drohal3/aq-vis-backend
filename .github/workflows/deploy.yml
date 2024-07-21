@@ -118,6 +118,12 @@ jobs:
           context: "{{defaultContext}}:app"
           push: true
           tags: drohal3/cpcvis-backend:latest
+      - name: Build and push tagged
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}"
+          push: true
+          tags: drohal3/aqvis-backend:${{ github.sha }}
   notify:
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
     needs: [ publish-docker-hub, publish-ecr ]
