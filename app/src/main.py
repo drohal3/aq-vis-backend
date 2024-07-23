@@ -98,6 +98,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Allow all origins in development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 for router in routers.values():
     app.include_router(
         router.get("router"),
@@ -109,13 +118,3 @@ for router in routers.values():
 @app.get("/")
 async def example():
     return {"message": "Hello"}
-
-
-# Allow all origins in development, TODO: adjust accordingly for production
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
