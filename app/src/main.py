@@ -97,13 +97,19 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
 # Allow all origins in development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://127.0.0.1",
+        "http://127.0.0.1:8080",
+        "http://localhost",
+        "http://localhost:8080" "https://yantdqyzzn.w-2.dockerdeploy.cloud",
+        "https://yantdqyzzn.w-2.dockerdeploy.cloud:443",
+        "https://yantdqyzzn.w-2.dockerdeploy.cloud:80",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "PUT", "PATCH", "POST", "DELETE"],
     allow_headers=["*"],
 )
 
