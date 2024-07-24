@@ -28,13 +28,13 @@ from src.database import get_database
 from src.database.operations.auth import (
     create_user_access_token,
 )
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)-8s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     # filename="basic.log",
 )
-
 
 
 logging.debug("This is a debug message.")
@@ -106,12 +106,13 @@ app.add_middleware(
         "http://localhost:5173",
         "https://yantdqyzzn.w-2.dockerdeploy.cloud",
         "https://yantdqyzzn.w-2.dockerdeploy.cloud:80",
-        "https://yantdqyzzn.w-2.dockerdeploy.cloud:443"
+        "https://yantdqyzzn.w-2.dockerdeploy.cloud:443",
     ],
     allow_credentials=True,
     allow_methods=["GET", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
+
 
 @app.post("/token", response_model=Token, status_code=201)
 async def login_for_token(
@@ -125,6 +126,7 @@ async def login_for_token(
         form_data.password,
         config.get_config(config.ENV_AUTH_ACCESS_TOKEN_EXPIRE_MINUTES),
     )
+
 
 for router in routers.values():
     app.include_router(
