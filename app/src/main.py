@@ -139,3 +139,8 @@ for router in routers.values():
 @app.get("/")
 async def example():
     return {"message": "Hello"}
+
+
+@app.post("/")
+async def example():
+    return {"message": "Hello"}
