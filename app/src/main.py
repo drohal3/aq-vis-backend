@@ -142,5 +142,5 @@ async def example():
 
 
 @app.post("/")
-async def example():
+async def hello():
     return {"message": "Hello"}
