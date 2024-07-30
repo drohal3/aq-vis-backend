@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import APIRouter, Depends
 from src.models.auth import Token
 from fastapi.security import OAuth2PasswordRequestForm
