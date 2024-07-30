@@ -130,10 +130,7 @@ def get_current_admin(token: str = Depends(oauth2_scheme)):
 def create_user_access_token(
     database, email: str, password: str, expires_in_minutes: int = 15
 ) -> Token:
-    logging.info(
-        "Creating token for user %s",
-        email
-    )
+    logging.info("Creating token for user %s", email)
     user = get_auth_user(database, email=email, password=password)
 
     access_token_expires = timedelta(minutes=int(expires_in_minutes))
