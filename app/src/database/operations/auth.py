@@ -53,7 +53,7 @@ def create_login_access_token(
 
 
 def get_auth_user(database, email: str, password: str):
-    credentials_exception = HTTPException(
+    auth_user_credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid email or password.",
         headers={"WWW-Authenticate": "Bearer"},
@@ -65,13 +65,13 @@ def get_auth_user(database, email: str, password: str):
         logging.info(
             "Failed login for user %s - incorrect username/email", email
         )
-        raise credentials_exception
+        raise auth_user_credentials_exception
 
     user = user.model_dump()
 
     if not verify_password(password, user["hashed_password"]):
         logging.info("Failed login for user %s - incorrect password", email)
-        raise credentials_exception
+        raise auth_user_credentials_exception
 
     return user
 

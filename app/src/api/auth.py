@@ -16,6 +16,7 @@ async def login_for_token(
     database=Depends(get_database),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
+    # TODO: might need headers={"WWW-Authenticate": "Bearer"}
     return create_user_access_token(
         database,
         form_data.username,
