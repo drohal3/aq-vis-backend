@@ -18,7 +18,6 @@ async def login_for_token(
     database=Depends(get_database),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
-    logging.debug("login_for_token()")
     return create_user_access_token(
         database,
         form_data.username,

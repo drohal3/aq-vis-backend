@@ -131,9 +131,8 @@ def create_user_access_token(
     database, email: str, password: str, expires_in_minutes: int = 15
 ) -> Token:
     logging.info(
-        "Creating token for user, expires in %d minutes",
-        email,
-        expires_in_minutes,
+        "Creating token for user %s",
+        email
     )
     user = get_auth_user(database, email=email, password=password)
 
