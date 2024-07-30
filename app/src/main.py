@@ -103,7 +103,8 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
+        "http://localhost",
+        "http://localhost:5174",
         "https://yantdqyzzn.w-2.dockerdeploy.cloud",
         "https://yantdqyzzn.w-2.dockerdeploy.cloud:80",
         "https://yantdqyzzn.w-2.dockerdeploy.cloud:443",

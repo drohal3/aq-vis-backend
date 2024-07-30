@@ -1,3 +1,4 @@
+import logging
 import time
 
 from passlib.context import CryptContext
@@ -61,11 +62,15 @@ def get_auth_user(database, email: str, password: str):
     user = find_unsecure_user_by_email(database, email)
 
     if not user:
+        logging.info(
+            "Failed login for user %s - incorrect username/email", email
+        )
         raise credentials_exception
 
     user = user.model_dump()
 
     if not verify_password(password, user["hashed_password"]):
+        logging.info("Failed login for user %s - incorrect password", email)
         raise credentials_exception
 
     return user
@@ -125,6 +130,11 @@ def get_current_admin(token: str = Depends(oauth2_scheme)):
 def create_user_access_token(
     database, email: str, password: str, expires_in_minutes: int = 15
 ) -> Token:
+    logging.info(
+        "Creating token for user, expires in %d minutes",
+        email,
+        expires_in_minutes,
+    )
     user = get_auth_user(database, email=email, password=password)
 
     access_token_expires = timedelta(minutes=int(expires_in_minutes))
