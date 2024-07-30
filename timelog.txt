@@ -42,3 +42,5 @@ TAKE a look TODO: https://medium.com/aspiring-data-scientist/deploy-a-fastapi-ap
        -20 21h  refactoring, adding tests, debugging
        -24 9h   refactoring, adding tests, fixing bugs, error handling
     -07-16 16h  3*~8h refactorings + related frontend changes
+    ______
+    124.5h
